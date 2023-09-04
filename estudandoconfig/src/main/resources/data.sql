@@ -1,0 +1,5 @@
+INSERT INTO product VALUES (4545,'T-Shirt',90,90.5)
+INSERT INTO product VALUES (555,'Shoe',90,90.5)
+INSERT INTO product VALUES (5554,'Sock',90,90.5)
+INSERT INTO product VALUES (7777,'Flip flop',90,90.5)
+INSERT INTO product VALUES (123123,'Hat',90,90.5)

@@ -1,5 +1,6 @@
 package com.paulo.estudandoconfig.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class Sale {
 	private List<ProductSale> products;
 	private String buyer;
 	private LocalDate date;
+	private BigDecimal totalPrice;
 	public Long getId() {
 		return id;
 	}
@@ -46,6 +48,12 @@ public class Sale {
 		this.date = date;
 	}
 	
+	public void setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
+	}
 	
 	
 	

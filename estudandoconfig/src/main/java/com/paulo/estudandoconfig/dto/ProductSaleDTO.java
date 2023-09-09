@@ -6,7 +6,6 @@ public class ProductSaleDTO {
 	
 	private Long id;
 	private Long productId;
-	private BigDecimal productPrice;
 	private Integer quantity;
 	public Long getId() {
 		return id;
@@ -20,12 +19,7 @@ public class ProductSaleDTO {
 	public void setProductId(Long productId) {
 		this.productId = productId;
 	}
-	public BigDecimal getProductPrice() {
-		return productPrice;
-	}
-	public void setProductPrice(BigDecimal productPrice) {
-		this.productPrice = productPrice;
-	}
+	
 	public Integer getQuantity() {
 		return quantity;
 	}

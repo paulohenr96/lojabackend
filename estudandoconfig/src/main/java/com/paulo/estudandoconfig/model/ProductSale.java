@@ -16,8 +16,7 @@ public class ProductSale {
 	@ManyToOne
 	private Product product;
 	private Integer quantity;
-	@ManyToOne
-	private Sale sale;
+	
 	public Long getId() {
 		return id;
 	}

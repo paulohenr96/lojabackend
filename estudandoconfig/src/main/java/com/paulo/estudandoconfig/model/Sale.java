@@ -1,7 +1,7 @@
 package com.paulo.estudandoconfig.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -21,7 +21,7 @@ public class Sale {
 	@OneToMany(cascade = CascadeType.PERSIST)
 	private List<ProductSale> products;
 	private String buyer;
-	private LocalDate date;
+	private LocalDateTime date;
 	private BigDecimal totalPrice;
 	public Long getId() {
 		return id;
@@ -41,10 +41,10 @@ public class Sale {
 	public void setBuyer(String buyer) {
 		this.buyer = buyer;
 	}
-	public LocalDate getDate() {
+	public LocalDateTime getDate() {
 		return date;
 	}
-	public void setDate(LocalDate date) {
+	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
 	

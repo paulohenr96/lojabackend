@@ -1,7 +1,7 @@
 package com.paulo.estudandoconfig.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +47,10 @@ public class SaleService {
 		 
 		sale.getProducts().forEach(this::updateQuantity); 
 		sale.setTotalPrice(totalPrice);
-		sale.setDate(LocalDate.now());
+		sale.setDate(LocalDateTime.now());
 		
 		Sale save = repository.save(sale);
-		return "Total - > ".concat(save.getTotalPrice().toString());
+		return "{}";
 	}
 
 	public void updateQuantity(ProductSale p) {
@@ -74,7 +74,12 @@ public class SaleService {
 		
 		repository.deleteById(id);
 		
-		return "ok";
+		return "{}";
+	}
+
+	public BigDecimal income(Integer month) {
+		// TODO Auto-generated method stub
+		return repository.totalIncome(month);
 	}
 	
 	

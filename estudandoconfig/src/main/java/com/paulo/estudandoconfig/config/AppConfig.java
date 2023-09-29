@@ -4,6 +4,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.paulo.estudandoconfig.JWTCreator;
+import com.paulo.estudandoconfig.filter.FilterAuthentication;
 import com.paulo.estudandoconfig.service.ProductService;
 import com.paulo.estudandoconfig.service.SaleService;
 
@@ -25,4 +27,10 @@ public class AppConfig {
 	public SaleService saleService() {
 		return new SaleService();
 	}
+	@Bean
+	public JWTCreator JWTCreator() {
+		return new JWTCreator();
+	}
+	
+	
 }

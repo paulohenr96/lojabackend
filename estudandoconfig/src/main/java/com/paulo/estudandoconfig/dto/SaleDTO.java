@@ -1,5 +1,7 @@
 package com.paulo.estudandoconfig.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -9,7 +11,8 @@ public class SaleDTO {
 	private Long id;
 	
 	private LocalDateTime date;
-	
+	private BigDecimal totalPrice;
+
 	private String buyer;
 	private List<ProductSaleDTO> products;
 	public Long getId() {
@@ -18,12 +21,7 @@ public class SaleDTO {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public LocalDateTime getDate() {
-		return date;
-	}
-	public void setDate(LocalDateTime date) {
-		this.date = date;
-	}
+	
 	public String getBuyer() {
 		return buyer;
 	}
@@ -35,6 +33,19 @@ public class SaleDTO {
 	}
 	public void setProducts(List<ProductSaleDTO> products) {
 		this.products = products;
+	}
+	public LocalDateTime getDate() {
+		return date;
+	}
+	public void setDate(LocalDateTime date) {
+		this.date = date;
+	}
+	
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
+	}
+	public void setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 	
 }

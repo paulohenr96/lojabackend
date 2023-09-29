@@ -6,6 +6,7 @@ public class ProductSaleDTO {
 	
 	private Long id;
 	private Long productId;
+	private String productName;
 	private Integer quantity;
 	public Long getId() {
 		return id;
@@ -27,7 +28,12 @@ public class ProductSaleDTO {
 		this.quantity = quantity;
 	}
 	
-	
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 	
 	
 }

@@ -1,6 +1,7 @@
 package com.paulo.estudandoconfig.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -8,15 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
 import com.paulo.estudandoconfig.model.Product;
 import com.paulo.estudandoconfig.repository.ProductRepository;
+import com.paulo.estudandoconfig.repository.SaleRepository;
 
 public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
-
+	@Autowired
+	private SaleRepository saleRepository;
+	
 	@Autowired
 	private ModelMapper modelMapper;
 
@@ -54,17 +59,25 @@ public class ProductService {
 
 		return modelMapper.map(optional.get(), ProductDTO.class);
 	}
-
+	public InfoDTO info() {
+		// TODO Auto-generated method stub
+		
+		InfoDTO info=new InfoDTO
+						(income(LocalDate.now().getMonth().getValue()),
+						count(),
+						sumQuantity());
+		return info;
+	}
 	public ProductDTO findById(Long id) {
 		// TODO Auto-generated method stub
 		return modelMapper.map(repository.findById(id).get(), ProductDTO.class);
 	}
 
-	public Integer sumQuantity() {
+	private Integer sumQuantity() {
 		return repository.sumQuantity();
 	}
-	
-	public Long count() {
+
+	private Long count() {
 		// TODO Auto-generated method stub
 		return repository.count();
 	}
@@ -78,5 +91,13 @@ public class ProductService {
 		Product save = repository.save(product);
 		return modelMapper.map(save, ProductDTO.class);
 	}
+
+	
+	
+	private BigDecimal income(Integer month) {
+		// TODO Auto-generated method stub
+		return saleRepository.totalIncome(month);
+	}
+	
 
 }

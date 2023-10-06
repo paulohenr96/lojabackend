@@ -1,7 +1,5 @@
 package com.paulo.estudandoconfig.controller;
 
-import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
 import com.paulo.estudandoconfig.service.ProductService;
-@CrossOrigin(origins ="http://localhost:4200/",allowCredentials = "true",allowedHeaders = "authorization",methods = RequestMethod.GET)
+@CrossOrigin(origins ="http://localhost:4200/",
+allowCredentials = "true",
+allowedHeaders = "authorization",
+methods = {RequestMethod.GET,RequestMethod.DELETE})
 @Controller
 @RequestMapping("products")
 public class ProductController {
@@ -61,14 +63,9 @@ public class ProductController {
 
 	}
 
-	@GetMapping("count")
-	public ResponseEntity<Long> countProduct( ){
-		return ResponseEntity.ok(service.count());
-
-	}
-	@GetMapping("totalproduct")
-	public ResponseEntity<Integer> totalProduct( ){
-		return ResponseEntity.ok(service.sumQuantity());
+	@GetMapping("infos")
+	public ResponseEntity<InfoDTO> countProduct(){
+		return ResponseEntity.ok(service.info());
 
 	}
 	

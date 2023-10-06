@@ -1,6 +1,8 @@
 package com.paulo.estudandoconfig.repository;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +14,12 @@ import com.paulo.estudandoconfig.model.Sale;
 public interface SaleRepository extends JpaRepository<Sale,Long> {
 
 	
-	@Query(nativeQuery =true,value = "select sum(total_price) from sale where MONTH(date)=:month")
+	@Query(nativeQuery =true,value = "select sum(total_price) from sale where  EXTRACT(MONTH from date)=:month")
 	BigDecimal totalIncome(Integer month);
+
+	@Query(nativeQuery=true,value="SELECT"
+			+ "    EXTRACT(MONTH FROM date) AS month,"
+			+ "    COUNT(*) AS quantity from sale GROUP by month")
+	List<int[]> chartSaleMonth();
 
 }

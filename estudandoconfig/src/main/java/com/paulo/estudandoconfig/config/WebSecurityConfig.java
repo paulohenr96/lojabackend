@@ -24,13 +24,16 @@ public class WebSecurityConfig {
 			
 			.csrf((csrf)->csrf
 					
-//					.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**"))
+					.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**"))
+					
 					.disable())
 			.cors().and()
+			
 			.authorizeHttpRequests((authorize) ->
 					authorize
 					
 					.requestMatchers("login").permitAll()
+					.requestMatchers("/h2/**").permitAll()
 
 					.anyRequest()
 					.authenticated()

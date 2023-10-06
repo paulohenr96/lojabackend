@@ -1,7 +1,5 @@
 package com.paulo.estudandoconfig.controller;
 
-import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.paulo.estudandoconfig.dto.ChartDTO;
 import com.paulo.estudandoconfig.dto.SaleDTO;
 import com.paulo.estudandoconfig.service.SaleService;
 @CrossOrigin(origins ="*" )
@@ -46,10 +45,16 @@ public class SaleController {
 
 		return ResponseEntity.ok(service.deleteById(id));
 	}
-	
-	@GetMapping("/income/{month}")
-	public ResponseEntity<BigDecimal> getIncome(@PathVariable(name="month") Integer month) {
-		return ResponseEntity.ok(service.income(month));
+	@GetMapping("chart")
+	public ResponseEntity<ChartDTO> chart() {
+		
+		return ResponseEntity.ok(service.saleChart());
 
 	}
+	
+//	@GetMapping("/income/{month}")
+//	public ResponseEntity<BigDecimal> getIncome(@PathVariable(name="month") Integer month) {
+//		return ResponseEntity.ok(service.income(month));
+//
+//	}
 }

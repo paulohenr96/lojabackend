@@ -1,13 +1,14 @@
 package com.paulo.estudandoconfig.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import com.paulo.estudandoconfig.dto.ChartDTO;
 import com.paulo.estudandoconfig.dto.SaleDTO;
 import com.paulo.estudandoconfig.model.Product;
 import com.paulo.estudandoconfig.model.ProductSale;
@@ -47,7 +48,7 @@ public class SaleService {
 		 
 		sale.getProducts().forEach(this::updateQuantity); 
 		sale.setTotalPrice(totalPrice);
-		sale.setDate(LocalDateTime.now());
+//		sale.setDate(LocalDateTime.now());
 		
 		Sale save = repository.save(sale);
 		return "{}";
@@ -76,10 +77,23 @@ public class SaleService {
 		
 		return "{}";
 	}
+	
+	
+	public ChartDTO saleChart() {
+		
+		
+		List<int[]> chart = repository.chartSaleMonth();
+		
+		
 
-	public BigDecimal income(Integer month) {
-		// TODO Auto-generated method stub
-		return repository.totalIncome(month);
+		
+		return new ChartDTO(
+				chart.stream().map(e-> e[0]).toList(),
+				chart.stream().map(e-> e[1]).toList()
+				);
+				
+		
+
 	}
 	
 	

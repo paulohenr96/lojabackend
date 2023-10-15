@@ -7,6 +7,7 @@ public class ProductDTO {
 	private String name;
 	private Integer quantity;
 	private BigDecimal price;
+	private String category;
 	public String getName() {
 		return name;
 	}
@@ -31,7 +32,12 @@ public class ProductDTO {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
 	
 	
 }

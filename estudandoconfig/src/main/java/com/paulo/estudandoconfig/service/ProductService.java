@@ -87,6 +87,7 @@ public class ProductService {
 		product.setName(p.getName());
 		product.setQuantity(p.getQuantity());
 		product.setPrice(p.getPrice());
+		product.setCategory(p.getCategory());
 
 		Product save = repository.save(product);
 		return modelMapper.map(save, ProductDTO.class);

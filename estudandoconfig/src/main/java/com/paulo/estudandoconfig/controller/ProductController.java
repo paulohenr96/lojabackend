@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
 import com.paulo.estudandoconfig.service.ProductService;
-@CrossOrigin(origins ="http://localhost:4200/",
-allowCredentials = "true",
-allowedHeaders = "authorization",
-methods = {RequestMethod.GET,RequestMethod.DELETE})
+@CrossOrigin(origins ="http://localhost:4200/")
 @Controller
 @RequestMapping("products")
 public class ProductController {
@@ -46,7 +43,7 @@ public class ProductController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO p,@PathVariable("id") Long id ){
-		
+		System.out.println("Entrou => "+p.getCategory());
 		return ResponseEntity.ok(service.updateById(p,id));
 	}
 	

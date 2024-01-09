@@ -46,9 +46,9 @@ public class SaleController {
 		return ResponseEntity.ok(service.deleteById(id));
 	}
 	@GetMapping("chart")
-	public ResponseEntity<ChartDTO> chart() {
+	public ResponseEntity<ChartDTO> chart(@RequestParam(name="year",defaultValue="2024")Integer year) {
 		
-		return ResponseEntity.ok(service.saleChart());
+		return ResponseEntity.ok(service.saleChart(year));
 
 	}
 	

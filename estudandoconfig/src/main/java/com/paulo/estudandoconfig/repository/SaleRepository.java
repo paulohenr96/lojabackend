@@ -11,15 +11,12 @@ import org.springframework.stereotype.Repository;
 import com.paulo.estudandoconfig.model.Sale;
 
 @Repository
-public interface SaleRepository extends JpaRepository<Sale,Long> {
+public interface SaleRepository extends JpaRepository<Sale, Long> {
 
-	
-	@Query(nativeQuery =true,value = "select sum(total_price) from sale where  EXTRACT(MONTH from date)=:month")
+	@Query(nativeQuery = true, value = "select sum(total_price) from sale where  EXTRACT(MONTH from date)=:month")
 	BigDecimal totalIncome(Integer month);
 
-	@Query(nativeQuery=true,value="SELECT"
-			+ "    EXTRACT(MONTH FROM date) AS month,"
-			+ "    COUNT(*) AS quantity from sale GROUP by month")
-	List<int[]> chartSaleMonth();
+	@Query(nativeQuery = true, value = "SELECT  EXTRACT(MONTH FROM date)as month , COUNT(*) AS quantity from sale where EXTRACT(YEAR FROM date)= :year GROUP by month")
+	List<int[]> chartSaleMonth(Integer year);
 
 }

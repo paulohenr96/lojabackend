@@ -23,6 +23,7 @@ public class Sale {
 	private String buyer;
 	private LocalDateTime date;
 	private BigDecimal totalPrice;
+	private String owner;
 	public Long getId() {
 		return id;
 	}
@@ -56,5 +57,10 @@ public class Sale {
 	}
 	
 	
-	
+	public String getOwner() {
+		return owner;
+	}
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
 }

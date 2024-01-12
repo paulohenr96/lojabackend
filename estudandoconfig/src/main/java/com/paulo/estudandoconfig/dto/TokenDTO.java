@@ -1,5 +1,6 @@
 package com.paulo.estudandoconfig.dto;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +14,7 @@ public class TokenDTO {
 	private String subject="";
 	
 	private String fullToken="";
+	private BigDecimal goal;
 
 	public List<String> getRoles() {
 		return roles;
@@ -45,6 +47,15 @@ public class TokenDTO {
 	public void setFullToken(String fullToken) {
 		this.fullToken = fullToken;
 	}
+
+	public BigDecimal getGoal() {
+		return goal;
+	}
+
+	public void setGoal(BigDecimal goal) {
+		this.goal = goal;
+	}
+
 	
 	
 	

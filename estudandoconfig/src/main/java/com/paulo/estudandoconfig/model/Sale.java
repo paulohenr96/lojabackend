@@ -24,6 +24,7 @@ public class Sale {
 	private LocalDateTime date;
 	private BigDecimal totalPrice;
 	private String owner;
+	
 	public Long getId() {
 		return id;
 	}

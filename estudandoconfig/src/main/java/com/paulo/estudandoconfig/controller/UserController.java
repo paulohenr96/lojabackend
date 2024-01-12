@@ -6,6 +6,7 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.paulo.estudandoconfig.dto.UserAccountDTO;
+import com.paulo.estudandoconfig.model.Metrics;
 import com.paulo.estudandoconfig.model.UserAccount;
+import com.paulo.estudandoconfig.repository.MetricRepository;
 import com.paulo.estudandoconfig.repository.RoleRepository;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
 
@@ -36,7 +38,9 @@ public class UserController {
 
 	@Autowired
 	private RoleRepository roleRepo;
-
+	
+	@Autowired
+	private MetricRepository metricsRepository;
 	
 	@PostMapping
 	public ResponseEntity<String> save(@RequestBody UserAccountDTO user) {
@@ -73,15 +77,17 @@ public class UserController {
 			
 			
 			
-			return ResponseEntity.ok("ok");
+			return ResponseEntity.ok("");
 
 		}
 		return ResponseEntity.ok("fail");
 
 	}
+//	@Secured(value="dfgdfgdfgdf")
+	@PreAuthorize("hasAuthority('admin')")
+
 	@GetMapping
 	public ResponseEntity<List<UserAccountDTO>> getAll() {
-
 		return ResponseEntity.ok(
 
 				repo.findAll().stream().map(e -> {
@@ -113,5 +119,20 @@ public class UserController {
 		
 		
 	}
-
+	
+	@GetMapping("metrics")
+	public ResponseEntity<Metrics> getMetrics() {
+		List<Metrics> list = metricsRepository.findAll();
+		Metrics m=new Metrics();
+		if (list.size()>0) {
+			m=list.get(0);
+		}
+		return ResponseEntity.ok(m);
+	}
+	@PutMapping("metrics")
+	public ResponseEntity<Metrics> editMetrics(@RequestBody Metrics m) {
+		
+		metricsRepository.save(m);
+		return ResponseEntity.ok(m);
+	}
 }

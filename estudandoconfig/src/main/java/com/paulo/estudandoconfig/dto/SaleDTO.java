@@ -14,6 +14,8 @@ public class SaleDTO {
 	private BigDecimal totalPrice;
 
 	private String buyer;
+	private String owner;
+
 	private List<ProductSaleDTO> products;
 	public Long getId() {
 		return id;
@@ -46,6 +48,12 @@ public class SaleDTO {
 	}
 	public void setTotalPrice(BigDecimal totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+	public String getOwner() {
+		return owner;
+	}
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 	
 }

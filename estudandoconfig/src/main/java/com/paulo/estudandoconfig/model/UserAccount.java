@@ -1,5 +1,6 @@
 package com.paulo.estudandoconfig.model;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
@@ -18,7 +19,8 @@ public class UserAccount {
 	private String name;
 	private String userName;
 	private String password;
-	
+	private BigDecimal monthlyGoal;
+
 	@ManyToMany
 	private Set<Role> roles;
 	
@@ -52,5 +54,11 @@ public class UserAccount {
 	}
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+	public BigDecimal getMonthlyGoal() {
+		return monthlyGoal;
+	}
+	public void setMonthlyGoal(BigDecimal monthlyGoal) {
+		this.monthlyGoal = monthlyGoal;
 	}
 }

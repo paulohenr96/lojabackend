@@ -47,6 +47,7 @@ public class LoginController {
 		String token = JWTCreator.newToken(dto);
 		System.out.println(token);
 		dto.setFullToken(token);
+		dto.setGoal(userAccount.getMonthlyGoal());
 		return ResponseEntity.ok(dto);
 	}
 

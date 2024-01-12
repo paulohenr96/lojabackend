@@ -38,8 +38,8 @@ public class SaleService {
 				.map(e -> e.getProduct().getPrice().multiply(BigDecimal.valueOf(e.getQuantity())))
 				.reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
-		sale.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
-		
+		sale.setOwner(username());
+
 		sale.getProducts().forEach(this::updateQuantity);
 		sale.setTotalPrice(totalPrice);
 //		sale.setDate(LocalDateTime.now());
@@ -61,7 +61,16 @@ public class SaleService {
 
 	public Page<SaleDTO> findAll(PageRequest of) {
 		// TODO Auto-generated method stub
+
 		return repository.findAll(of).map(e -> mapper.map(e, SaleDTO.class));
+
+	}
+
+	public Page<SaleDTO> findAllByUsername(PageRequest of) {
+		// TODO Auto-generated method stub
+
+		return repository.findAllByOwner(of, username()).map(e -> mapper.map(e, SaleDTO.class));
+
 	}
 
 	public String deleteById(Long id) {
@@ -72,11 +81,34 @@ public class SaleService {
 		return "{}";
 	}
 
-	public ChartDTO saleChart(Integer year) {
+	private boolean isAdmin() {
+		return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+				.filter(e -> e.getAuthority().equals("admin")).findFirst().isPresent();
+	}
 
-		List<int[]> chart = repository.chartSaleMonth(year);
+	private String username() {
+		return SecurityContextHolder.getContext().getAuthentication().getName();
+	}
+
+	public ChartDTO saleChart(Integer year) {
+		if (isAdmin()) {
+
+			List<int[]> chart = repository.chartSaleMonth(year);
+			return new ChartDTO(chart.stream().map(e -> e[0]).toList(), chart.stream().map(e -> e[1]).toList());
+		}
+		String username = username();
+		return saleChartByUser(year, username);
+	}
+
+	public ChartDTO saleChartByUser(Integer year, String username) {
+
+		List<int[]> chart = repository.chartSaleMonth(year, username);
 
 		return new ChartDTO(chart.stream().map(e -> e[0]).toList(), chart.stream().map(e -> e[1]).toList());
+
+	}
+	public BigDecimal incomeByUsername(Integer month,String username) {
+		return repository.totalIncome(month,username);
 
 	}
 

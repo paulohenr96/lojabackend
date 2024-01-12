@@ -44,9 +44,10 @@ public class FilterAuthentication extends OncePerRequestFilter {
 			
 			TokenDTO dto = JWTCreator.verifyToken(token);
 			if (dto != null) {
-				SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(dto.getSubject(), "",
+				SecurityContextHolder.getContext()
+				.setAuthentication(new UsernamePasswordAuthenticationToken(dto.getSubject(), "",
 						dto.getRoles().stream().map(e->new SimpleGrantedAuthority(e)).toList()));
-
+				
 			} else {
 				System.out.println("Token fora de data !");
 				SecurityContextHolder.clearContext();

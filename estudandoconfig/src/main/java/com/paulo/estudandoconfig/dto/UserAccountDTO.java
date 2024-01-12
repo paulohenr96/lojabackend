@@ -1,5 +1,6 @@
 package com.paulo.estudandoconfig.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.paulo.estudandoconfig.model.Role;
@@ -10,6 +11,8 @@ public class UserAccountDTO {
 	private String userName;
 	private String password;
 	private String name;
+	private BigDecimal monthlyGoal;
+
 	private List<String> rolesName;
 	public String getUserName() {
 		return userName;
@@ -40,5 +43,11 @@ public class UserAccountDTO {
 	}
 	public Long getId() {
 		return id;
+	}
+	public BigDecimal getMonthlyGoal() {
+		return monthlyGoal;
+	}
+	public void setMonthlyGoal(BigDecimal monthlyGoal) {
+		this.monthlyGoal = monthlyGoal;
 	}
 }

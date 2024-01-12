@@ -2,6 +2,7 @@ package com.paulo.estudandoconfig.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -12,45 +13,34 @@ import com.paulo.estudandoconfig.filter.FilterAuthentication;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true,jsr250Enabled = true)
 public class WebSecurityConfig {
 
-	
-	
-	 
-	 @Bean
-		public SecurityFilterChain  securityFilterChain(HttpSecurity http) throws Exception {
-			http
-			
-			
-			.csrf((csrf)->csrf
-					
-					.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**"))
-					
-					.disable())
-			.cors().and()
-			
-			.authorizeHttpRequests((authorize) ->
-					authorize
-					
-					.requestMatchers("login").permitAll()
-					.requestMatchers("/h2/**").permitAll()
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
 
-					.anyRequest()
-					.authenticated()
+				.csrf((csrf) -> csrf
+
+						.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**"))
+
+						.disable())
+				.cors().and()
+				
+				.authorizeHttpRequests((authorize) -> authorize
+
+						.requestMatchers("login").permitAll()
+						
+
+						.anyRequest().authenticated()
 //					.permitAll()
-					
-					)
-			.addFilterAfter(new FilterAuthentication(),UsernamePasswordAuthenticationFilter.class)
 
-			;
-			
-			
-			 
-					
-					
-	
-			return http.build();
-		}
+				).addFilterAfter(new FilterAuthentication(), UsernamePasswordAuthenticationFilter.class)
+
+		;
+
+		return http.build();
+	}
 //	 
 //	 @Bean
 //	 CorsConfigurationSource corsConfigurationSource() {
@@ -74,6 +64,5 @@ public class WebSecurityConfig {
 //		 
 //	 
 //	 }
-	 
-	 
+
 }

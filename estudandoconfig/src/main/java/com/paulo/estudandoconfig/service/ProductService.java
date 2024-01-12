@@ -2,12 +2,14 @@ package com.paulo.estudandoconfig.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
@@ -68,6 +70,15 @@ public class ProductService {
 						sumQuantity());
 		return info;
 	}
+	public List<ProductDTO> checkQuantity(){
+		return repository.findAll()
+				.stream()
+				.filter(e->e.getQuantity()<10)
+				.map(e->modelMapper.map(e,ProductDTO.class))
+				.toList();
+	}
+	
+	
 	public ProductDTO findById(Long id) {
 		// TODO Auto-generated method stub
 		return modelMapper.map(repository.findById(id).get(), ProductDTO.class);
@@ -97,8 +108,21 @@ public class ProductService {
 	
 	private BigDecimal income(Integer month) {
 		// TODO Auto-generated method stub
-		return saleRepository.totalIncome(month);
+		
+		if (SecurityContextHolder.getContext()
+				.getAuthentication()
+				.getAuthorities()
+				.stream().filter(e->e
+						.getAuthority().equals("admin")).findFirst().isPresent())
+		
+		{
+			return saleRepository.totalIncome(month);
+		}
+		String username=SecurityContextHolder.getContext().getAuthentication().getName();
+		return saleRepository.totalIncome(month,username);
 	}
 	
 
+	
+	
 }

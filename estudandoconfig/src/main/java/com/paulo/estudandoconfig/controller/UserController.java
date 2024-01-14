@@ -2,11 +2,17 @@ package com.paulo.estudandoconfig.controller;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,13 +29,14 @@ import com.paulo.estudandoconfig.model.UserAccount;
 import com.paulo.estudandoconfig.repository.MetricRepository;
 import com.paulo.estudandoconfig.repository.RoleRepository;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
+import com.paulo.estudandoconfig.util.ControllerUtil;
 
 @CrossOrigin(origins ="*" )
 
 @Controller
 @RequestMapping("users")
 
-public class UserController {
+public class UserController extends ControllerUtil{
 	@Autowired
 	private ModelMapper mapper;
 
@@ -53,25 +60,60 @@ public class UserController {
 			
 			UserAccount account = mapper.map(user, UserAccount.class);
 			account.setRoles(new HashSet<>(user.getRolesName().stream().map(e->roleRepo.findByName(e).get()).toList()));
-			
+			cripto(account);
 			repo.save(account);
-			return ResponseEntity.ok("ok");
+			return ResponseEntity.ok("");
+
+		}
+		return new ResponseEntity<String>("",HttpStatus.CONFLICT);
+
+	}
+	private void cripto(UserAccount account) {
+		String password = account.getPassword();
+		account.setPassword(new BCryptPasswordEncoder().encode(password));
+	}
+	@PutMapping
+	public ResponseEntity<String> edit(@RequestBody UserAccountDTO user) {
+		
+		Optional<UserAccount> optional = repo.findById(user.getId());
+		if (!optional.isEmpty()) {
+			
+			UserAccount ac = optional.get();
+			if (!ac.getUserName().equals(user.getUserName())) {
+				if (repo.findByUserName(user.getUserName()).isPresent())return ResponseEntity.ok(super.responseJson("Invalid username"));
+			}
+			
+			UserAccount account = mapper.map(user, UserAccount.class);
+			
+			account.setRoles(new HashSet<>(user.getRolesName().stream().map(e->roleRepo.findByName(e).get()).toList()));
+			account.setPassword(ac.getPassword());
+			repo.save(account);
+			
+			
+			
+			
+			
+			return ResponseEntity.ok("");
 
 		}
 		return ResponseEntity.ok("fail");
 
 	}
-	@PutMapping
-	public ResponseEntity<String> edit(@RequestBody UserAccountDTO user) {
-		if (!repo.findByUserName(user.getUserName()).isEmpty()) {
+	
+	
+	@PutMapping("newpassword")
+	public ResponseEntity<String> newPassword(@RequestBody UserAccountDTO user) {
+		
+		Optional<UserAccount> optional = repo.findById(user.getId());
+		if (!optional.isEmpty()) {
+			
+			UserAccount ac = optional.get();
+			
+			
+			ac.setPassword(user.getPassword());
+			cripto(ac);
 
-			
-			
-			
-			UserAccount account = mapper.map(user, UserAccount.class);
-			account.setRoles(new HashSet<>(user.getRolesName().stream().map(e->roleRepo.findByName(e).get()).toList()));
-			
-			repo.save(account);
+			repo.save(ac);
 			
 			
 			
@@ -129,6 +171,20 @@ public class UserController {
 		}
 		return ResponseEntity.ok(m);
 	}
+	@PreAuthorize("hasAuthority('admin')")
+	@PostMapping("confirmpassword")
+	public ResponseEntity<String> confirmPassword(@RequestBody String password) {
+		String username=SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		 boolean matches = new BCryptPasswordEncoder()
+			.matches(password,repo.findByUserName(username)
+					.get()
+					.getPassword());
+			return ResponseEntity.ok(super.responseJson(matches+""));
+
+	}
+	
+	
 	@PutMapping("metrics")
 	public ResponseEntity<Metrics> editMetrics(@RequestBody Metrics m) {
 		

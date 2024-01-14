@@ -1,6 +1,7 @@
 package com.paulo.estudandoconfig.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -42,8 +43,7 @@ public class SaleService {
 
 		sale.getProducts().forEach(this::updateQuantity);
 		sale.setTotalPrice(totalPrice);
-//		sale.setDate(LocalDateTime.now());
-
+			sale.setDate(LocalDateTime.now());
 		Sale save = repository.save(sale);
 		return "{}";
 	}

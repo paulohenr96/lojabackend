@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.paulo.estudandoconfig.JWTCreator;
-import com.paulo.estudandoconfig.filter.FilterAuthentication;
+import com.paulo.estudandoconfig.repository.SaleRepository;
 import com.paulo.estudandoconfig.service.ProductService;
 import com.paulo.estudandoconfig.service.SaleService;
 
@@ -31,6 +31,8 @@ public class AppConfig {
 	public JWTCreator JWTCreator() {
 		return new JWTCreator();
 	}
+	
+	
 	
 	
 }

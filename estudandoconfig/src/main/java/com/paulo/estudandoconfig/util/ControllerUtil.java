@@ -5,6 +5,7 @@ public class ControllerUtil {
 	
 	
 	public String responseJson(String s) {
-		return "{'response':'%s'".format(s);
+	    return String.format("{\"response\":\"%s\"}", s);
 	}
+
 }

@@ -7,11 +7,9 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,12 +29,12 @@ import com.paulo.estudandoconfig.repository.RoleRepository;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
 import com.paulo.estudandoconfig.util.ControllerUtil;
 
-@CrossOrigin(origins ="*" )
+@CrossOrigin(origins = "*")
 
 @Controller
 @RequestMapping("users")
 
-public class UserController extends ControllerUtil{
+public class UserController extends ControllerUtil {
 	@Autowired
 	private ModelMapper mapper;
 
@@ -45,10 +43,10 @@ public class UserController extends ControllerUtil{
 
 	@Autowired
 	private RoleRepository roleRepo;
-	
+
 	@Autowired
 	private MetricRepository metricsRepository;
-	
+
 	@PostMapping
 	public ResponseEntity<String> save(@RequestBody UserAccountDTO user) {
 		user.setId(null);
@@ -56,139 +54,107 @@ public class UserController extends ControllerUtil{
 		
 		
 		if (repo.findByUserName(user.getUserName()).isEmpty()) {
-
-			
-			UserAccount account = mapper.map(user, UserAccount.class);
-			account.setRoles(new HashSet<>(user.getRolesName().stream().map(e->roleRepo.findByName(e).get()).toList()));
-			cripto(account);
-			repo.save(account);
-			return ResponseEntity.ok("");
+			cripto(user);
+			return saveDTO(user);
 
 		}
-		return new ResponseEntity<String>("",HttpStatus.CONFLICT);
+
+		return new ResponseEntity<String>("", HttpStatus.CONFLICT);
 
 	}
-	private void cripto(UserAccount account) {
-		String password = account.getPassword();
-		account.setPassword(new BCryptPasswordEncoder().encode(password));
-	}
+
 	@PutMapping
 	public ResponseEntity<String> edit(@RequestBody UserAccountDTO user) {
-		
-		Optional<UserAccount> optional = repo.findById(user.getId());
-		if (!optional.isEmpty()) {
-			
-			UserAccount ac = optional.get();
-			if (!ac.getUserName().equals(user.getUserName())) {
-				if (repo.findByUserName(user.getUserName()).isPresent())return ResponseEntity.ok(super.responseJson("Invalid username"));
-			}
-			
-			UserAccount account = mapper.map(user, UserAccount.class);
-			
-			account.setRoles(new HashSet<>(user.getRolesName().stream().map(e->roleRepo.findByName(e).get()).toList()));
-			account.setPassword(ac.getPassword());
-			repo.save(account);
-			
-			
-			
-			
-			
-			return ResponseEntity.ok("");
-
-		}
-		return ResponseEntity.ok("fail");
-
+		return repo.findById(user.getId()).map(e -> {
+			if ((!e.getUserName().equals(user.getUserName())) && repo.findByUserName(user.getUserName()).isPresent())
+				return ResponseEntity.ok(super.responseJson("Invalid username"));
+			user.setPassword(e.getPassword());
+			return saveDTO(user);
+		}).orElse(ResponseEntity.ok("fail"));
 	}
-	
-	
+
 	@PutMapping("newpassword")
 	public ResponseEntity<String> newPassword(@RequestBody UserAccountDTO user) {
-		
-		Optional<UserAccount> optional = repo.findById(user.getId());
-		if (!optional.isEmpty()) {
-			
-			UserAccount ac = optional.get();
-			
-			
-			ac.setPassword(user.getPassword());
-			cripto(ac);
 
-			repo.save(ac);
-			
-			
-			
-			
-			
+		return repo.findById(user.getId()).map(e -> {
+			cripto(user);
+			e.setPassword(user.getPassword());
+			repo.save(e);
 			return ResponseEntity.ok("");
-
-		}
-		return ResponseEntity.ok("fail");
+		}).orElse(ResponseEntity.ok("fail"));
 
 	}
+
 //	@Secured(value="dfgdfgdfgdf")
 	@PreAuthorize("hasAuthority('admin')")
 
 	@GetMapping
 	public ResponseEntity<List<UserAccountDTO>> getAll() {
-		return ResponseEntity.ok(
-
-				repo.findAll().stream().map(e -> {
-					UserAccountDTO dto = mapper.map(e, UserAccountDTO.class);
-
-					dto.setRolesName(e.getRoles().stream().map(r -> r.getName()).toList());
-					return dto;
-
-				}).toList());
+		return ResponseEntity.ok(repo.findAll().stream().map(this::toDTO).toList());
 	}
 
 	@GetMapping("{id}")
 	public ResponseEntity<UserAccountDTO> getById(@PathVariable(name = "id") Long id) {
 		UserAccount account = repo.findById(id).get();
-		UserAccountDTO dto = mapper.map(account, UserAccountDTO.class);
-		dto.setRolesName(account.getRoles().stream().map(e->e.getName()).toList());
-		return ResponseEntity.ok(dto);
+
+		return ResponseEntity.ok(toDTO(account));
 	}
-	
+
 	@DeleteMapping("{id}")
-	public ResponseEntity<String> deleteById(@PathVariable(name="id")Long id){
-		
+	public ResponseEntity<String> deleteById(@PathVariable(name = "id") Long id) {
+
 		if (repo.existsById(id)) {
 			repo.deleteById(id);
 			return ResponseEntity.ok("");
-		};
+		}
+
 		return ResponseEntity.ok("{User Not Found}");
-		
-		
-		
+
 	}
-	
+
 	@GetMapping("metrics")
 	public ResponseEntity<Metrics> getMetrics() {
 		List<Metrics> list = metricsRepository.findAll();
-		Metrics m=new Metrics();
-		if (list.size()>0) {
-			m=list.get(0);
+		Metrics m = new Metrics();
+		if (list.size() > 0) {
+			m = list.get(0);
 		}
 		return ResponseEntity.ok(m);
 	}
+
 	@PreAuthorize("hasAuthority('admin')")
 	@PostMapping("confirmpassword")
 	public ResponseEntity<String> confirmPassword(@RequestBody String password) {
-		String username=SecurityContextHolder.getContext().getAuthentication().getName();
-		
-		 boolean matches = new BCryptPasswordEncoder()
-			.matches(password,repo.findByUserName(username)
-					.get()
-					.getPassword());
-			return ResponseEntity.ok(super.responseJson(matches+""));
-
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		boolean matches = new BCryptPasswordEncoder().matches(password,
+				repo.findByUserName(username).get().getPassword());
+		return ResponseEntity.ok(super.responseJson(matches + ""));
 	}
-	
-	
+
 	@PutMapping("metrics")
 	public ResponseEntity<Metrics> editMetrics(@RequestBody Metrics m) {
-		
+
 		metricsRepository.save(m);
 		return ResponseEntity.ok(m);
 	}
+
+	private void cripto(UserAccountDTO account) {
+		String password = account.getPassword();
+		account.setPassword(new BCryptPasswordEncoder().encode(password));
+	}
+
+	private UserAccountDTO toDTO(UserAccount u) {
+		UserAccountDTO dto = mapper.map(u, UserAccountDTO.class);
+		dto.setRolesName(u.getRoles().stream().map(r -> r.getName()).toList());
+		return dto;
+	}
+
+	private ResponseEntity<String> saveDTO(UserAccountDTO user) {
+		UserAccount account = mapper.map(user, UserAccount.class);
+
+		account.setRoles(new HashSet<>(user.getRolesName().stream().map(e -> roleRepo.findByName(e).get()).toList()));
+		repo.save(account);
+		return ResponseEntity.ok("");
+	}
+
 }

@@ -71,7 +71,6 @@ public class SaleController {
 	@GetMapping("chart/username")
 	public ResponseEntity<ChartDTO> chartByUsername(@RequestParam(name = "year", defaultValue = "2024") Integer year,
 			@RequestParam(name = "username",required = true) String username) {
-		System.out.println("Username = > "+username);
 		return ResponseEntity.ok(service.saleChartByUser(year,username));
 
 	}

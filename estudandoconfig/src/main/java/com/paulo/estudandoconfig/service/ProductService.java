@@ -23,7 +23,7 @@ public class ProductService {
 	private ProductRepository repository;
 	@Autowired
 	private SaleRepository saleRepository;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
 
@@ -52,33 +52,25 @@ public class ProductService {
 	public ProductDTO deleteById(Long id) {
 		// TODO Auto-generated method stub
 
-		Optional<Product> optional = repository.findById(id);
-		if (optional.isEmpty()) {
-			throw new RuntimeException("Product does not exist.");
-		}
+		return repository.findById(id).map((e) -> {
+			repository.deleteById(id);
+			return modelMapper.map(e, ProductDTO.class);
+		}).orElseThrow(() -> new RuntimeException("Product does not exist."));
 
-		repository.deleteById(id);
-
-		return modelMapper.map(optional.get(), ProductDTO.class);
 	}
+
 	public InfoDTO info() {
 		// TODO Auto-generated method stub
-		
-		InfoDTO info=new InfoDTO
-						(income(LocalDate.now().getMonth().getValue()),
-						count(),
-						sumQuantity());
+
+		InfoDTO info = new InfoDTO(income(LocalDate.now().getMonth().getValue()), count(), sumQuantity());
 		return info;
 	}
-	public List<ProductDTO> checkQuantity(){
-		return repository.findAll()
-				.stream()
-				.filter(e->e.getQuantity()<10)
-				.map(e->modelMapper.map(e,ProductDTO.class))
-				.toList();
+
+	public List<ProductDTO> checkQuantity() {
+		return repository.findAll().stream().filter(e -> e.getQuantity() < 10)
+				.map(e -> modelMapper.map(e, ProductDTO.class)).toList();
 	}
-	
-	
+
 	public ProductDTO findById(Long id) {
 		// TODO Auto-generated method stub
 		return modelMapper.map(repository.findById(id).get(), ProductDTO.class);
@@ -104,25 +96,17 @@ public class ProductService {
 		return modelMapper.map(save, ProductDTO.class);
 	}
 
-	
-	
 	private BigDecimal income(Integer month) {
 		// TODO Auto-generated method stub
-		
-		if (SecurityContextHolder.getContext()
-				.getAuthentication()
-				.getAuthorities()
-				.stream().filter(e->e
-						.getAuthority().equals("admin")).findFirst().isPresent())
-		
+
+		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+				.filter(e -> e.getAuthority().equals("admin")).findFirst().isPresent())
+
 		{
 			return saleRepository.totalIncome(month);
 		}
-		String username=SecurityContextHolder.getContext().getAuthentication().getName();
-		return saleRepository.totalIncome(month,username);
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		return saleRepository.totalIncome(month, username);
 	}
-	
 
-	
-	
 }

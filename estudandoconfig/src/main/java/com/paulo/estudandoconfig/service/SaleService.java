@@ -92,7 +92,6 @@ public class SaleService {
 
 	public ChartDTO saleChart(Integer year) {
 		if (isAdmin()) {
-
 			List<int[]> chart = repository.chartSaleMonth(year);
 			return new ChartDTO(chart.stream().map(e -> e[0]).toList(), chart.stream().map(e -> e[1]).toList());
 		}

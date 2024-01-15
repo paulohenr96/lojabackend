@@ -20,36 +20,32 @@ import com.paulo.estudandoconfig.dto.TokenDTO;
 import com.paulo.estudandoconfig.model.UserAccount;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
 
-@CrossOrigin(origins ="http://localhost:4200/",allowCredentials = "true",allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:4200/", allowCredentials = "true", allowedHeaders = "*")
 @Controller
 public class LoginController {
-	
+
 	@Autowired
-	private  UserAccountRepository repository;
-	
-	
+	private UserAccountRepository repository;
+
 	@PostMapping("login")
 	public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO login) {
-		
-		Optional<UserAccount> userOpt = repository.findByUserName(login.getUsername());
 
-		if (userOpt.isEmpty()) {
-			return ResponseEntity.ok(new TokenDTO());
-		}
-		UserAccount userAccount = userOpt.get();
-		if (!new BCryptPasswordEncoder().matches(login.getPassword(), userAccount.getPassword()))return ResponseEntity.ok(new TokenDTO());
+		return repository.findByUserName(login.getUsername()).map((e) -> {
+			if (!new BCryptPasswordEncoder().matches(login.getPassword(), e.getPassword()))
+				return ResponseEntity.ok(new TokenDTO());
+
+			TokenDTO dto = new TokenDTO();
+			dto.setSubject(e.getUserName());
+			dto.setRoles(e.getRoles().stream().map(e2 -> e2.getName()).toList());
 			
-		
-		
-		
-		TokenDTO dto = new TokenDTO();
-		dto.setSubject(userAccount.getUserName());
-		dto.setRoles(userAccount.getRoles().stream().map(e->e.getName()).toList());
-		String token = JWTCreator.newToken(dto);
-		System.out.println(token);
-		dto.setFullToken(token);
-		dto.setGoal(userAccount.getMonthlyGoal());
-		return ResponseEntity.ok(dto);
+			
+			String token = JWTCreator.newToken(dto);
+			dto.setFullToken(token);
+			dto.setGoal(e.getMonthlyGoal());
+			return ResponseEntity.ok(dto);
+		}).orElse(ResponseEntity.ok(new TokenDTO()));
+
+
 	}
 
 	@GetMapping("logout")

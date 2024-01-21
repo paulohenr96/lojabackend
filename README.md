@@ -11,14 +11,6 @@ Rest API for an Inventory Management System
 | Spring Security      | Authentication, protect the endpoints and etc    |
 | Spring Starter Web      | Tools useful to build the web application like Tomcat     |
 
-# Repositories
-
-# Services
-
-# Controllers
-
-# Security
-
 # Entities
 | Entity  | Description | Fields |
 | ------------- |:-------------:|:-------------:|
@@ -31,5 +23,25 @@ Rest API for an Inventory Management System
 
 
 # DTO
+| DTO  | Description | Fields |
+| ------------- |:-------------:|:-------------:|
+|  ProductDTO    |Information about the product entity     |id,name,quantity,price,category     |
+| ProductSaleDTO   | Information about Product that was sold    | id,productId,productName,quantity    |
+| SaleDTO | Information about Sale     |Id,products,buyer,date,totalPrice,owner     |
+| UserAccountDTO |Information about the entity UserAccount     |Id,userName,name,password,monthlyGoal,rolesName     |
+| TokenDTO     | When the user send the right credentials (username and password) the api send back informations like the Token |roles,issuedDate,subject,fullToken     |
+| LoginDTO      | Credentials used to login (username and password)   |username,password    |
+| InfoDTO      |  Some general information, like the number of different products on stock and the total quantity   |income,totalProduct,sumQuantity    |
+| ChartDTO      | Informations to create the bar chart   |xAxis,yAxis    |
+
+# Repositories
+
+# Services
+
+# Controllers
+
+# Security
+
+
 
 # Chart

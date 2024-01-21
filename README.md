@@ -44,6 +44,11 @@ Rest API for an Inventory Management System
 | UserAccountRepository     | UserAccount |
 
 # Services
+| Repository  | Dependencies | Description|
+| ------------- |:-------------:|:-------------:|
+|  ProductService    |    ProductRepository, SaleRepository,ModelMapper     | Interface between ProductController and the ProductRepository |
+| SaleService   |SaleRepository, ProductRepository and ModelMapper   | Interface between the SaleController and the SaleRepository|
+
 
 # Controllers
 

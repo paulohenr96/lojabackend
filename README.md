@@ -20,6 +20,15 @@ Rest API for an Inventory Management System
 # Security
 
 # Entities
+| Entity  | Description | Fields |
+| ------------- |:-------------:|:-------------:|
+|  Product     | Entity that represent the product on the inventory     |id,name,quantity,price,category     |
+| ProductSale   | Product that was sold    | id,product (many to one),quantity    |
+| Sale | Entity that represent a sale     |Id,products(one to many),buyer,date,totalPrice,owner     |
+| UserAccount | Entity that represent the user account     |Id,name,userName,password,monthlyGoal,roles (many to many)     |
+| Role     | Diferent Roles the user can have     |Id,name     |
+| Metrics      | Metrics of the system    |Id,monthlyGoal     |
+
 
 # DTO
 

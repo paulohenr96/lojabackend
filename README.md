@@ -35,6 +35,13 @@ Rest API for an Inventory Management System
 | ChartDTO      | Informations to create the bar chart   |xAxis,yAxis    |
 
 # Repositories
+| Repository  | Model |
+| ------------- |:-------------:|:-------------:|
+|  ProductRepository    |Product        |
+| ProductSaleRepository   |ProductSale   |
+| RoleRepository | Role     |
+| SaleRepository |Sale        |
+| UserAccountRepository     | UserAccount |
 
 # Services
 

@@ -44,13 +44,19 @@ Rest API for an Inventory Management System
 | UserAccountRepository     | UserAccount |
 
 # Services
-| Repository  | Dependencies | Description|
+| Service  | Dependencies | Description|
 | ------------- |:-------------:|:-------------:|
 |  ProductService    |    ProductRepository, SaleRepository,ModelMapper     | Interface between ProductController and the ProductRepository |
 | SaleService   |SaleRepository, ProductRepository and ModelMapper   | Interface between the SaleController and the SaleRepository|
 
 
 # Controllers
+| Controller  | Dependencies | Description|
+| ------------- |:-------------:|:-------------:|
+|  LoginController    |   UserAccountRepository     | Operations related to login and logout  |
+| ProductController   |ProductService   | Call the ProductService according to the request|
+| SaleController   |SaleService   |Call the SaleService according to the request|
+| UserController   |ModelMapper,UserAccountRepository,RoleRepository,MetricRepository| Crud operations related to the user, and also configure the metrics|
 
 # Security
 

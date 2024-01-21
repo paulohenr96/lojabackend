@@ -61,7 +61,7 @@ Rest API for an Inventory Management System
 # Security
 
 | Class  |  Description|
-| ------------- |:-------------:|:-------------:|
+| ------------- |:-------------:|
 |  WebSecurityConfig    |   General spring security configuration       |
 | JWTCreator   | Create new Token or check if the token is valid  |
 | FilterAuthentication   | Filter that checks if the client send the token inside the header **Authorization**  |

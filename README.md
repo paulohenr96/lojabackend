@@ -36,7 +36,7 @@ Rest API for an Inventory Management System
 
 # Repositories
 | Repository  | Model |
-| ------------- |:-------------:|:-------------:|
+| ------------- |:-------------:|
 |  ProductRepository    |Product        |
 | ProductSaleRepository   |ProductSale   |
 | RoleRepository | Role     |

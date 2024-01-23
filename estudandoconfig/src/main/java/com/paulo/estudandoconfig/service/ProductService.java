@@ -30,7 +30,6 @@ public class ProductService {
 	public String save(ProductDTO produtoDTO) {
 
 		Product map = modelMapper.map(produtoDTO, Product.class);
-		System.out.println(map.getId());
 		map.setId(null);
 		repository.save(map);
 		return "ok";
@@ -41,12 +40,19 @@ public class ProductService {
 		if (pageRequest.getPageNumber() < 0) {
 			pageRequest = PageRequest.of(0, pageRequest.getPageSize());
 		}
-		return repository.findAll(pageRequest).map(e -> modelMapper.map(e, ProductDTO.class));
+		return repository.findAll(pageRequest).map(this::toDTO);
 	}
-
+	public Page<ProductDTO> getAll(PageRequest pageRequest,String category) {
+		// TODO Auto-generated method stub
+		if (pageRequest.getPageNumber() < 0) {
+			pageRequest = PageRequest.of(0, pageRequest.getPageSize());
+		}
+		return repository.findAllByCategory(pageRequest,category).map(this::toDTO);
+	}
 	public ProductDTO updateById(ProductDTO p, Long id) {
-		Optional<Product> productOpt = repository.findById(id);
-		return productOpt.isEmpty() ? null : update(productOpt.get(), p);
+		
+		return repository.findById(id).map((e)->update(e,p)).orElse(null);
+		
 	}
 
 	public ProductDTO deleteById(Long id) {
@@ -54,7 +60,7 @@ public class ProductService {
 
 		return repository.findById(id).map((e) -> {
 			repository.deleteById(id);
-			return modelMapper.map(e, ProductDTO.class);
+			return toDTO(e);
 		}).orElseThrow(() -> new RuntimeException("Product does not exist."));
 
 	}
@@ -68,7 +74,7 @@ public class ProductService {
 
 	public List<ProductDTO> checkQuantity() {
 		return repository.findAll().stream().filter(e -> e.getQuantity() < 10)
-				.map(e -> modelMapper.map(e, ProductDTO.class)).toList();
+				.map(this::toDTO).toList();
 	}
 
 	public ProductDTO findById(Long id) {
@@ -93,7 +99,7 @@ public class ProductService {
 		product.setCategory(p.getCategory());
 
 		Product save = repository.save(product);
-		return modelMapper.map(save, ProductDTO.class);
+		return toDTO(save);
 	}
 
 	private BigDecimal income(Integer month) {
@@ -109,4 +115,7 @@ public class ProductService {
 		return saleRepository.totalIncome(month, username);
 	}
 
+	private ProductDTO toDTO (Product p) {
+		return modelMapper.map(p, ProductDTO.class);
+	}
 }

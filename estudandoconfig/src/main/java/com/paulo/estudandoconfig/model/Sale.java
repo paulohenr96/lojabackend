@@ -1,5 +1,6 @@
 package com.paulo.estudandoconfig.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,8 +13,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class Sale {
+public class Sale implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2574840083903428392L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
@@ -63,5 +69,11 @@ public class Sale {
 	}
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+	public void calculateTotal() {
+		this.totalPrice=this.getProducts().stream()
+		.map(e -> e.getProduct().getPrice().multiply(BigDecimal.valueOf(e.getQuantity())))
+		.reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
+
 	}
 }

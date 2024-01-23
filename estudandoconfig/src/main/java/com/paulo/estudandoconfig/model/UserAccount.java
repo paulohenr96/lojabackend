@@ -1,5 +1,6 @@
 package com.paulo.estudandoconfig.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -10,9 +11,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 
 @Entity
-public class UserAccount {
+public class UserAccount implements Serializable {
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3893489977033070350L;
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;

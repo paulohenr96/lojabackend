@@ -17,7 +17,6 @@ public class JWTCreator {
 	
 	
 	public static String newToken(TokenDTO t) {
-		String token="";
 		
 		JwtBuilder builder = Jwts.builder();
 		JwtBuilder claim = builder.setSubject(t.getSubject()).claim("roles", t.getRoles());

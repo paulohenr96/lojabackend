@@ -22,7 +22,6 @@ public class WebSecurityConfig {
 
 				.csrf((csrf) -> csrf
 
-						.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**"))
 
 						.disable())
 				.cors().and()
@@ -30,7 +29,7 @@ public class WebSecurityConfig {
 				.authorizeHttpRequests((authorize) -> authorize
 
 						.requestMatchers("login").permitAll()
-						
+						.requestMatchers("users").hasAuthority("admin")
 
 						.anyRequest().authenticated()
 //					.permitAll()

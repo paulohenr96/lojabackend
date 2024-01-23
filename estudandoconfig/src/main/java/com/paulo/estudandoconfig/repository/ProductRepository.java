@@ -1,7 +1,7 @@
 package com.paulo.estudandoconfig.repository;
 
-import java.math.BigDecimal;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,4 +13,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 	
 	@Query(nativeQuery = true,value = "SELECT SUM(quantity) from product")
 	public Integer sumQuantity();
+	
+	Page<Product> findAllByCategory(PageRequest p,String category);
 }

@@ -30,21 +30,13 @@ public class SaleService {
 	private ProductRepository productRepository;
 
 	public String finishSale(SaleDTO dto) {
-
 		Sale sale = mapper.map(dto, Sale.class);
-
 		sale.getProducts().forEach(e -> e.setProduct(productRepository.findById(e.getProduct().getId()).get()));
-
-		BigDecimal totalPrice = sale.getProducts().stream()
-				.map(e -> e.getProduct().getPrice().multiply(BigDecimal.valueOf(e.getQuantity())))
-				.reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
-
 		sale.setOwner(username());
-
 		sale.getProducts().forEach(this::updateQuantity);
-		sale.setTotalPrice(totalPrice);
-			sale.setDate(LocalDateTime.now());
-		Sale save = repository.save(sale);
+		sale.calculateTotal();
+		sale.setDate(LocalDateTime.now());
+		repository.save(sale);
 		return "{}";
 	}
 
@@ -53,36 +45,26 @@ public class SaleService {
 		if (product.getQuantity() < p.getQuantity()) {
 			throw new RuntimeException("Not enough product on stock");
 		}
-
 		product.setQuantity(product.getQuantity() - p.getQuantity());
-
 		productRepository.save(product);
 	}
 
 	public Page<SaleDTO> findAll(PageRequest of) {
-		// TODO Auto-generated method stub
-
-		return repository.findAll(of).map(e -> mapper.map(e, SaleDTO.class));
-
+		return repository.findAll(of).map(this::toDTO);
 	}
 
 	public Page<SaleDTO> findAllByUsername(PageRequest of) {
-		// TODO Auto-generated method stub
-
-		return repository.findAllByOwner(of, username()).map(e -> mapper.map(e, SaleDTO.class));
-
+		return repository.findAllByOwner(of, username()).map(this::toDTO);
 	}
 
 	public String deleteById(Long id) {
-		// TODO Auto-generated method stub
-
 		repository.deleteById(id);
-
 		return "{}";
 	}
 
 	private boolean isAdmin() {
-		return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+		return SecurityContextHolder.getContext()
+				.getAuthentication().getAuthorities().stream()
 				.filter(e -> e.getAuthority().equals("admin")).findFirst().isPresent();
 	}
 
@@ -91,24 +73,22 @@ public class SaleService {
 	}
 
 	public ChartDTO saleChart(Integer year) {
-		if (isAdmin()) {
-			List<int[]> chart = repository.chartSaleMonth(year);
-			return new ChartDTO(chart.stream().map(e -> e[0]).toList(), chart.stream().map(e -> e[1]).toList());
-		}
-		String username = username();
-		return saleChartByUser(year, username);
+		return isAdmin() ? buildChart(repository.chartSaleMonth(year)) : saleChartByUser(year, username());
+
 	}
 
 	public ChartDTO saleChartByUser(Integer year, String username) {
-
-		List<int[]> chart = repository.chartSaleMonth(year, username);
-
-		return new ChartDTO(chart.stream().map(e -> e[0]).toList(), chart.stream().map(e -> e[1]).toList());
-
-	}
-	public BigDecimal incomeByUsername(Integer month,String username) {
-		return repository.totalIncome(month,username);
-
+		return buildChart(repository.chartSaleMonth(year, username));
 	}
 
+	public BigDecimal incomeByUsername(Integer month, String username) {
+		return repository.totalIncome(month, username);
+
+	}
+	private SaleDTO toDTO(Sale sale) {
+		return  mapper.map(sale, SaleDTO.class);
+	}
+	private ChartDTO buildChart(List<int[]> arr) {
+		return new ChartDTO(arr.stream().map(e -> e[0]).toList(), arr.stream().map(e -> e[1]).toList());
+	}
 }

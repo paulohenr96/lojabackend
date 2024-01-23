@@ -33,6 +33,7 @@ public class ProductController {
 	public ResponseEntity<String> saveProduct(@RequestBody ProductDTO dto) {
 		
 		String save = service.save(dto);
+		System.out.println("Teste");
 		return ResponseEntity.ok("");
 	}
 
@@ -42,14 +43,20 @@ public class ProductController {
 		return ResponseEntity.ok(service.getAll(PageRequest.of(page,size)));
 	}
 
-
+	@GetMapping("category/{category}")
+	public ResponseEntity<Page<ProductDTO>> getAllByCategory(@RequestParam(name="page",defaultValue = "0") Integer page,
+			@RequestParam(name="size",defaultValue = "3") Integer size,
+			@PathVariable(name="category") String category) {
+		return ResponseEntity.ok(service.getAll(PageRequest.of(page,size),category));
+	}
 	@PutMapping("/{id}")
 	public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO p,@PathVariable("id") Long id ){
-		System.out.println("Entrou => "+p.getCategory());
 		return ResponseEntity.ok(service.updateById(p,id));
 	}
+	
+	
+	
 	@PreAuthorize("hasAuthority('admin')")
-
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ProductDTO> deleteProduct(@PathVariable("id") Long id ){
 		

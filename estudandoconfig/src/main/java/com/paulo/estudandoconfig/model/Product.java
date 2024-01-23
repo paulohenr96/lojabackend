@@ -1,17 +1,24 @@
 package com.paulo.estudandoconfig.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 
 @Entity
-public class Product {
+public class Product implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7689139971358663099L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name="SEQ_GEN",sequenceName="SEQ_PRODUCT",allocationSize=1,initialValue = 300)
+	@GeneratedValue(generator="SEQ_GEN")
 	private Long id;
 	private String name;
 	private Integer quantity;

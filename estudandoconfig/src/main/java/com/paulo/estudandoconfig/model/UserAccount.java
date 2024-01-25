@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import org.modelmapper.ModelMapper;
+
+import com.paulo.estudandoconfig.dto.UserAccountDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -65,5 +69,11 @@ public class UserAccount implements Serializable {
 	}
 	public void setMonthlyGoal(BigDecimal monthlyGoal) {
 		this.monthlyGoal = monthlyGoal;
+	}
+	public UserAccountDTO toDTO() {
+		UserAccountDTO dto = new ModelMapper().map(this, UserAccountDTO.class);
+		dto.setRolesName(this.getRoles().stream().map(Role::getName).toList());
+
+		return dto;
 	}
 }

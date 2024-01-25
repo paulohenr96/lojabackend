@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
 import com.paulo.estudandoconfig.model.Product;
@@ -42,17 +43,19 @@ public class ProductService {
 		}
 		return repository.findAll(pageRequest).map(this::toDTO);
 	}
-	public Page<ProductDTO> getAll(PageRequest pageRequest,String category) {
+
+	public Page<ProductDTO> getAll(PageRequest pageRequest, String category) {
 		// TODO Auto-generated method stub
 		if (pageRequest.getPageNumber() < 0) {
 			pageRequest = PageRequest.of(0, pageRequest.getPageSize());
 		}
-		return repository.findAllByCategory(pageRequest,category).map(this::toDTO);
+		return repository.findAllByCategory(pageRequest, category).map(this::toDTO);
 	}
+
 	public ProductDTO updateById(ProductDTO p, Long id) {
-		
-		return repository.findById(id).map((e)->update(e,p)).orElse(null);
-		
+
+		return repository.findById(id).map((e) -> update(e, p)).orElse(null);
+
 	}
 
 	public ProductDTO deleteById(Long id) {
@@ -66,15 +69,13 @@ public class ProductService {
 	}
 
 	public InfoDTO info() {
-		// TODO Auto-generated method stub
 
 		InfoDTO info = new InfoDTO(income(LocalDate.now().getMonth().getValue()), count(), sumQuantity());
 		return info;
 	}
 
 	public List<ProductDTO> checkQuantity() {
-		return repository.findAll().stream().filter(e -> e.getQuantity() < 10)
-				.map(this::toDTO).toList();
+		return repository.findAll().stream().filter(e -> e.getQuantity() < 10).map(this::toDTO).toList();
 	}
 
 	public ProductDTO findById(Long id) {
@@ -105,17 +106,16 @@ public class ProductService {
 	private BigDecimal income(Integer month) {
 		// TODO Auto-generated method stub
 
-		if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.filter(e -> e.getAuthority().equals("admin")).findFirst().isPresent())
+		if (ContextHolder.isAdmin())
 
 		{
 			return saleRepository.totalIncome(month);
 		}
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		String username = ContextHolder.getUsername();
 		return saleRepository.totalIncome(month, username);
 	}
 
-	private ProductDTO toDTO (Product p) {
+	private ProductDTO toDTO(Product p) {
 		return modelMapper.map(p, ProductDTO.class);
 	}
 }

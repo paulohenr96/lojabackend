@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.ChartDTO;
 import com.paulo.estudandoconfig.dto.SaleDTO;
 import com.paulo.estudandoconfig.model.Product;
@@ -31,8 +32,9 @@ public class SaleService {
 
 	public String finishSale(SaleDTO dto) {
 		Sale sale = mapper.map(dto, Sale.class);
-		sale.getProducts().forEach(e -> e.setProduct(productRepository.findById(e.getProduct().getId()).get()));
-		sale.setOwner(username());
+		sale.getProducts()
+		.forEach(e -> e.setProduct(productRepository.findById(e.getProduct().getId()).get()));
+		sale.setOwner(ContextHolder.getUsername());
 		sale.getProducts().forEach(this::updateQuantity);
 		sale.calculateTotal();
 		sale.setDate(LocalDateTime.now());
@@ -54,7 +56,7 @@ public class SaleService {
 	}
 
 	public Page<SaleDTO> findAllByUsername(PageRequest of) {
-		return repository.findAllByOwner(of, username()).map(this::toDTO);
+		return repository.findAllByOwner(of, ContextHolder.getUsername()).map(this::toDTO);
 	}
 
 	public String deleteById(Long id) {
@@ -62,18 +64,12 @@ public class SaleService {
 		return "{}";
 	}
 
-	private boolean isAdmin() {
-		return SecurityContextHolder.getContext()
-				.getAuthentication().getAuthorities().stream()
-				.filter(e -> e.getAuthority().equals("admin")).findFirst().isPresent();
-	}
+	
 
-	private String username() {
-		return SecurityContextHolder.getContext().getAuthentication().getName();
-	}
+	
 
 	public ChartDTO saleChart(Integer year) {
-		return isAdmin() ? buildChart(repository.chartSaleMonth(year)) : saleChartByUser(year, username());
+		return ContextHolder.isAdmin() ? buildChart(repository.chartSaleMonth(year)) : saleChartByUser(year, ContextHolder.getUsername());
 
 	}
 

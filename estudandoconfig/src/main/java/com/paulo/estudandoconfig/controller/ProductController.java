@@ -32,8 +32,7 @@ public class ProductController {
 	@PostMapping
 	public ResponseEntity<String> saveProduct(@RequestBody ProductDTO dto) {
 		
-		String save = service.save(dto);
-		System.out.println("Teste");
+		service.save(dto);
 		return ResponseEntity.ok("");
 	}
 

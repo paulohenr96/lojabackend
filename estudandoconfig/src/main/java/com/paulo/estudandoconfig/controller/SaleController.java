@@ -21,7 +21,7 @@ import com.paulo.estudandoconfig.dto.ChartDTO;
 import com.paulo.estudandoconfig.dto.SaleDTO;
 import com.paulo.estudandoconfig.service.SaleService;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200/")
 @Controller
 @RequestMapping("sales")
 public class SaleController {

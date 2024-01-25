@@ -5,13 +5,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.UserAccountDTO;
 import com.paulo.estudandoconfig.model.Metrics;
 import com.paulo.estudandoconfig.model.Role;
@@ -51,15 +50,15 @@ public class UserController extends ControllerUtil {
 	private MetricRepository metricsRepository;
 
 	@PostMapping
-	public ResponseEntity<String> save(@RequestBody UserAccountDTO user) {
+	public ResponseEntity<String> newUser(@RequestBody UserAccountDTO user) {
 
-		return repo.findByUserName(user.getUserName()).map((e) -> ResponseEntity.ok(responseJson("Invalid Username")))
-				.orElseGet(() -> criptoAndSaveDTO(user));
+		return repo.findByUserName(user.getUserName()).map((e) -> ResponseEntity.ok(("Invalid Username")))
+				.orElseGet(() -> criptoAndSaveDTO.apply(user));
 	}
 
 	@PutMapping
 	public ResponseEntity<String> edit(@RequestBody UserAccountDTO userDTO) {
-		return repo.findById(userDTO.getId()).map(user -> extracted(userDTO, user))
+		return repo.findById(userDTO.getId()).map(user -> checkUsername(userDTO, user))
 				.orElseGet(() -> ResponseEntity.ok("fail"));
 
 	}
@@ -75,13 +74,12 @@ public class UserController extends ControllerUtil {
 
 	@GetMapping
 	public ResponseEntity<List<UserAccountDTO>> getAll() {
-		return ResponseEntity.ok(repo.findAll().stream().map(toDTO::apply).toList());
+		return ResponseEntity.ok(repo.findAll().stream().map(UserAccount::toDTO).toList());
 	}
 
 	@GetMapping("{id}")
 	public ResponseEntity<UserAccountDTO> getById(@PathVariable(name = "id") Long id) {
-
-		return repo.findById(id).map(toDTO::apply).map(ResponseEntity::ok).get();
+		return repo.findById(id).map(UserAccount::toDTO).map(ResponseEntity::ok).get();
 	}
 
 	@DeleteMapping("{id}")
@@ -102,12 +100,12 @@ public class UserController extends ControllerUtil {
 
 	@PostMapping("confirmpassword")
 	public ResponseEntity<String> confirmPassword(@RequestBody String password) {
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		String username = ContextHolder.getUsername();
 
 		BiPredicate<String, String> matchPassword = (raw, crypto) -> new BCryptPasswordEncoder().matches(raw, crypto);
-		
-		
-		String responseString = String.valueOf(matchPassword.test(password, repo.findByUserName(username).get().getPassword()));
+
+		String responseString = String
+				.valueOf(matchPassword.test(password, repo.findByUserName(username).get().getPassword()));
 		String responseJson = super.responseJson(responseString);
 		return ResponseEntity.ok(responseJson);
 	}
@@ -121,14 +119,7 @@ public class UserController extends ControllerUtil {
 
 	private Function<String, String> cripto = raw -> new BCryptPasswordEncoder().encode(raw);
 
-	private Function<UserAccount, UserAccountDTO> toDTO = (u) -> {
-		UserAccountDTO dto = mapper.map(u, UserAccountDTO.class);
-		dto.setRolesName(u.getRoles().stream().map(Role::getName).toList());
-
-		return dto;
-	};
-
-	private ResponseEntity<String> extracted(UserAccountDTO userDTO, UserAccount user) {
+	private ResponseEntity<String> checkUsername(UserAccountDTO userDTO, UserAccount user) {
 
 		boolean usernameChanged = !user.getUserName().equalsIgnoreCase(userDTO.getUserName());
 		if (usernameChanged) {
@@ -136,26 +127,28 @@ public class UserController extends ControllerUtil {
 			if (existUserWithSameUsername)
 				return ResponseEntity.ok(super.responseJson("Invalid username"));
 		}
-		return editAndSaveDTO(userDTO, user.getPassword());
+		userDTO.setPassword(user.getPassword());
+		return saveDTO.apply(userDTO);
 	}
 
-	private ResponseEntity<String> editAndSaveDTO(UserAccountDTO userDTO, String p) {
-		userDTO.setPassword(p);
-		return saveDTO(userDTO);
-	}
+	private Function<UserAccount, ResponseEntity<String>> save = user -> {
+		repo.save(user);
+		return ResponseEntity.ok("");
 
+	};
 	private Function<List<String>, Set<Role>> rolesNamesToObjects = names -> names.stream()
 			.map(name -> roleRepo.findByName(name)).map(Optional::get).collect(Collectors.toSet());
 
-	private ResponseEntity<String> saveDTO(UserAccountDTO user) {
+	private Function<UserAccountDTO, UserAccount> toEntity = (user) -> {
 		UserAccount account = mapper.map(user, UserAccount.class);
 		account.setRoles(rolesNamesToObjects.apply(user.getRolesName()));
-		repo.save(account);
-		return ResponseEntity.ok("");
-	}
+		return account;
+	};
 
-	private ResponseEntity<String> criptoAndSaveDTO(UserAccountDTO user) {
+	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> toEntity.andThen(save).apply(user);;
+
+	private Function<UserAccountDTO, ResponseEntity<String>> criptoAndSaveDTO = (user) -> {
 		user.setPassword(cripto.apply(user.getPassword()));
-		return saveDTO(user);
-	}
+		return saveDTO.apply(user);
+	};
 }

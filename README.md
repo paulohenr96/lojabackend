@@ -67,37 +67,10 @@ Rest API for an Inventory Management System
 | FilterAuthentication   | Filter that checks if the client send the token inside the header **Authorization**  |
 
 # CrossOrigin
-Inside the WebSecurityConfig I created the bean CorsConfigurationSource with all the configuration necessary for the cors. 
+Inside every controller it was written the annotation below
 ```
- @Bean
-	 CorsConfigurationSource corsConfigurationSource() {
-	   CorsConfiguration configuration = new CorsConfiguration();
-	   configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-	   configuration.setAllowedMethods(Arrays.asList("GET","POST","PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
-	   configuration.setAllowCredentials(true);
-	   configuration.setAllowedHeaders(Arrays.asList("authorization", "Requestor-Type"));
-	   configuration.setExposedHeaders(Arrays.asList("X-Get-Header"));
-	   configuration.setMaxAge(3600L);
-	   UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	   source.registerCorsConfiguration("/**", configuration);
-	   return source; }
+@CrossOrigin(origins ="http://localhost:4200/")
 
 ```
-After that the bean was set on the bean securityFilterChain
 
-```
- 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf((csrf) -> csrf
-						.disable())
-				.cors(cors->cors.configurationSource(corsConfigurationSource()))
-				.authorizeHttpRequests((authorize) -> authorize
-						.requestMatchers("login").permitAll()
-						.requestMatchers("users").hasAuthority("admin")
-						.anyRequest().authenticated()
-				).addFilterAfter(new FilterAuthentication(), UsernamePasswordAuthenticationFilter.class);
-		return http.build();
-	}
-```
 

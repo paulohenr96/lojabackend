@@ -67,6 +67,7 @@ Rest API for an Inventory Management System
 | FilterAuthentication   | Filter that checks if the client send the token inside the header **Authorization**  |
 
 # CrossOrigin
+The below annotation were written on every controller
 ```
 @CrossOrigin(origins = "http://localhost:4200/")
 ````

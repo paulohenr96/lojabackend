@@ -83,15 +83,21 @@ Inside the WebSecurityConfig I created the bean CorsConfigurationSource with all
 	   return source; }
 
 ```
-After that the bean was set on the class securityFilterChain
+After that the bean was set on the bean securityFilterChain
 
 ```
- 				http
-          //some configuration
-          
-          .cors(cors->cors.configurationSource(corsConfigurationSource()))
-
-          // more configuration
-          .build()
+ 	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+				.csrf((csrf) -> csrf
+						.disable())
+				.cors(cors->cors.configurationSource(corsConfigurationSource()))
+				.authorizeHttpRequests((authorize) -> authorize
+						.requestMatchers("login").permitAll()
+						.requestMatchers("users").hasAuthority("admin")
+						.anyRequest().authenticated()
+				).addFilterAfter(new FilterAuthentication(), UsernamePasswordAuthenticationFilter.class);
+		return http.build();
+	}
 ```
 

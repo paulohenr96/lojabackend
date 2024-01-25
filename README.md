@@ -67,7 +67,31 @@ Rest API for an Inventory Management System
 | FilterAuthentication   | Filter that checks if the client send the token inside the header **Authorization**  |
 
 # CrossOrigin
-The below annotation were written on every controller
+Inside the WebSecurityConfig I created the bean CorsConfigurationSource with all the configuration necessary for the cors. 
 ```
-@CrossOrigin(origins = "http://localhost:4200/")
-````
+ @Bean
+	 CorsConfigurationSource corsConfigurationSource() {
+	   CorsConfiguration configuration = new CorsConfiguration();
+	   configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+	   configuration.setAllowedMethods(Arrays.asList("GET","POST","PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
+	   configuration.setAllowCredentials(true);
+	   configuration.setAllowedHeaders(Arrays.asList("authorization", "Requestor-Type"));
+	   configuration.setExposedHeaders(Arrays.asList("X-Get-Header"));
+	   configuration.setMaxAge(3600L);
+	   UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	   source.registerCorsConfiguration("/**", configuration);
+	   return source; }
+
+```
+After that the bean was set on the class securityFilterChain
+
+```
+ 				http
+          //some configuration
+          
+          .cors(cors->cors.configurationSource(corsConfigurationSource()))
+
+          // more configuration
+          .build()
+```
+

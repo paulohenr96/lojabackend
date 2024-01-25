@@ -66,4 +66,7 @@ Rest API for an Inventory Management System
 | JWTCreator   | Create new Token or check if the token is valid  |
 | FilterAuthentication   | Filter that checks if the client send the token inside the header **Authorization**  |
 
-# Chart
+# CrossOrigin
+```
+@CrossOrigin(origins = "http://localhost:4200/")
+````

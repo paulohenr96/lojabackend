@@ -5,10 +5,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -69,7 +71,7 @@ public class UserController extends ControllerUtil {
 			e.setPassword(cripto.apply(user.getPassword()));
 			repo.save(e);
 			return ResponseEntity.ok("");
-		}).orElseGet(() -> ResponseEntity.ok("fail"));
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@GetMapping
@@ -79,22 +81,28 @@ public class UserController extends ControllerUtil {
 
 	@GetMapping("{id}")
 	public ResponseEntity<UserAccountDTO> getById(@PathVariable(name = "id") Long id) {
-		return repo.findById(id).map(UserAccount::toDTO).map(ResponseEntity::ok).get();
+		return repo.findById(id)
+				.map(UserAccount::toDTO)
+				.map(ResponseEntity::ok)
+				.get();
 	}
 
 	@DeleteMapping("{id}")
-	public ResponseEntity<String> deleteById(@PathVariable(name = "id") Long id) {
+	public ResponseEntity deleteById(@PathVariable(name = "id") Long id) {
 		if (repo.existsById(id)) {
 			repo.deleteById(id);
 			return ResponseEntity.ok("");
 		}
-		return ResponseEntity.ok("{User Not Found}");
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
 	}
 
 	@GetMapping("metrics")
 	public ResponseEntity<Metrics> getMetrics() {
-		return metricsRepository.findAll().stream().findFirst().map(ResponseEntity::ok)
+		return metricsRepository.findAll()
+				.stream()
+				.findFirst()
+				.map(ResponseEntity::ok)
 				.orElseGet(() -> ResponseEntity.ok(new Metrics()));
 	}
 
@@ -104,10 +112,13 @@ public class UserController extends ControllerUtil {
 
 		BiPredicate<String, String> matchPassword = (raw, crypto) -> new BCryptPasswordEncoder().matches(raw, crypto);
 
-		String responseString = String
-				.valueOf(matchPassword.test(password, repo.findByUserName(username).get().getPassword()));
-		String responseJson = super.responseJson(responseString);
-		return ResponseEntity.ok(responseJson);
+		
+		return matchPassword.test(password,
+								repo.findByUserName(username)
+								.get().getPassword())?
+				new ResponseEntity<>(HttpStatus.OK):
+				new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		
 	}
 
 	@PutMapping("metrics")
@@ -117,15 +128,15 @@ public class UserController extends ControllerUtil {
 		return ResponseEntity.ok(m);
 	}
 
-	private Function<String, String> cripto = raw -> new BCryptPasswordEncoder().encode(raw);
-
+	private UnaryOperator<String> cripto = raw -> new BCryptPasswordEncoder().encode(raw);
+	
 	private ResponseEntity<String> checkUsername(UserAccountDTO userDTO, UserAccount user) {
 
 		boolean usernameChanged = !user.getUserName().equalsIgnoreCase(userDTO.getUserName());
 		if (usernameChanged) {
 			boolean existUserWithSameUsername = repo.findByUserName(userDTO.getUserName()).isPresent();
 			if (existUserWithSameUsername)
-				return ResponseEntity.ok(super.responseJson("Invalid username"));
+				return new ResponseEntity(HttpStatus.CONFLICT);
 		}
 		userDTO.setPassword(user.getPassword());
 		return saveDTO.apply(userDTO);
@@ -133,7 +144,7 @@ public class UserController extends ControllerUtil {
 
 	private Function<UserAccount, ResponseEntity<String>> save = user -> {
 		repo.save(user);
-		return ResponseEntity.ok("");
+		return new ResponseEntity(HttpStatus.OK);
 
 	};
 	private Function<List<String>, Set<Role>> rolesNamesToObjects = names -> names.stream()

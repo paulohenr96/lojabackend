@@ -56,19 +56,20 @@ public class UserController extends ControllerUtil {
 	}
 
 	@PutMapping
-	public ResponseEntity<String> edit(@RequestBody UserAccountDTO userDTO) {
+	public ResponseEntity edit(@RequestBody UserAccountDTO userDTO) {
 		return repo.findById(userDTO.getId()).map(user -> checkUsername(userDTO, user))
-				.orElseGet(() -> ResponseEntity.ok("fail"));
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
 	}
 
 	@PutMapping("newpassword")
-	public ResponseEntity<String> newPassword(@RequestBody UserAccountDTO user) {
+	public ResponseEntity newPassword(@RequestBody UserAccountDTO user) {
 		return repo.findById(user.getId()).map(e -> {
 			e.setPassword(cripto.apply(user.getPassword()));
 			repo.save(e);
-			return ResponseEntity.ok("");
-		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+			return new ResponseEntity<>(HttpStatus.OK);
+		})
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@GetMapping
@@ -91,7 +92,6 @@ public class UserController extends ControllerUtil {
 			return ResponseEntity.ok("");
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
 	}
 
 	@GetMapping("metrics")
@@ -106,16 +106,12 @@ public class UserController extends ControllerUtil {
 	@PostMapping("confirmpassword")
 	public ResponseEntity<String> confirmPassword(@RequestBody String password) {
 		String username = ContextHolder.getUsername();
-
 		BiPredicate<String, String> matchPassword = (raw, crypto) -> new BCryptPasswordEncoder().matches(raw, crypto);
-
-		
 		return matchPassword.test(password,
 								repo.findByUserName(username)
 								.get().getPassword())?
 				new ResponseEntity<>(HttpStatus.OK):
 				new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		
 	}
 
 	@PutMapping("metrics")
@@ -126,7 +122,6 @@ public class UserController extends ControllerUtil {
 	}
 
 	private UnaryOperator<String> cripto = raw -> new BCryptPasswordEncoder().encode(raw);
-	
 	private ResponseEntity<String> checkUsername(UserAccountDTO userDTO, UserAccount user) {
 
 		boolean usernameChanged = !user.getUserName().equalsIgnoreCase(userDTO.getUserName());
@@ -138,23 +133,12 @@ public class UserController extends ControllerUtil {
 		userDTO.setPassword(user.getPassword());
 		return saveDTO.apply(userDTO);
 	}
-
 	private Function<UserAccount, ResponseEntity<String>> save = user -> {
 		repo.save(user);
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	};
-//	private Function<List<String>, Set<Role>> rolesNamesToObjects = names -> names.stream()
-//			.map(name -> roleRepo.findByName(name)).map(Optional::get).collect(Collectors.toSet());
-//
-//	private Function<UserAccountDTO, UserAccount> toEntity = (user) -> {
-//		UserAccount account = mapper.map(user, UserAccount.class);
-//		account.setRoles(rolesNamesToObjects.apply(user.getRolesName()));
-//		return account;
-//	};
-
 	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> ProductMapper.toEntity.andThen(save).apply(user);;
-
 	private Function<UserAccountDTO, ResponseEntity<String>> criptoAndSaveDTO = (user) -> {
 		user.setPassword(cripto.apply(user.getPassword()));
 		return saveDTO.apply(user);

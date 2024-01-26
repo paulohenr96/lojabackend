@@ -70,10 +70,5 @@ public class UserAccount implements Serializable {
 	public void setMonthlyGoal(BigDecimal monthlyGoal) {
 		this.monthlyGoal = monthlyGoal;
 	}
-	public UserAccountDTO toDTO() {
-		UserAccountDTO dto = new ModelMapper().map(this, UserAccountDTO.class);
-		dto.setRolesName(this.getRoles().stream().map(Role::getName).toList());
-
-		return dto;
-	}
+	
 }

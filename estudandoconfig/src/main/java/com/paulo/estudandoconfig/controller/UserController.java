@@ -1,12 +1,9 @@
 package com.paulo.estudandoconfig.controller;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.UserAccountDTO;
+import com.paulo.estudandoconfig.mapper.ProductMapper;
 import com.paulo.estudandoconfig.model.Metrics;
-import com.paulo.estudandoconfig.model.Role;
 import com.paulo.estudandoconfig.model.UserAccount;
 import com.paulo.estudandoconfig.repository.MetricRepository;
 import com.paulo.estudandoconfig.repository.RoleRepository;
@@ -76,13 +73,13 @@ public class UserController extends ControllerUtil {
 
 	@GetMapping
 	public ResponseEntity<List<UserAccountDTO>> getAll() {
-		return ResponseEntity.ok(repo.findAll().stream().map(UserAccount::toDTO).toList());
+		return ResponseEntity.ok(repo.findAll().stream().map(ProductMapper::toDTO).toList());
 	}
 
 	@GetMapping("{id}")
 	public ResponseEntity<UserAccountDTO> getById(@PathVariable(name = "id") Long id) {
 		return repo.findById(id)
-				.map(UserAccount::toDTO)
+				.map(ProductMapper::toDTO)
 				.map(ResponseEntity::ok)
 				.get();
 	}
@@ -147,16 +144,16 @@ public class UserController extends ControllerUtil {
 		return new ResponseEntity(HttpStatus.OK);
 
 	};
-	private Function<List<String>, Set<Role>> rolesNamesToObjects = names -> names.stream()
-			.map(name -> roleRepo.findByName(name)).map(Optional::get).collect(Collectors.toSet());
+//	private Function<List<String>, Set<Role>> rolesNamesToObjects = names -> names.stream()
+//			.map(name -> roleRepo.findByName(name)).map(Optional::get).collect(Collectors.toSet());
+//
+//	private Function<UserAccountDTO, UserAccount> toEntity = (user) -> {
+//		UserAccount account = mapper.map(user, UserAccount.class);
+//		account.setRoles(rolesNamesToObjects.apply(user.getRolesName()));
+//		return account;
+//	};
 
-	private Function<UserAccountDTO, UserAccount> toEntity = (user) -> {
-		UserAccount account = mapper.map(user, UserAccount.class);
-		account.setRoles(rolesNamesToObjects.apply(user.getRolesName()));
-		return account;
-	};
-
-	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> toEntity.andThen(save).apply(user);;
+	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> ProductMapper.toEntity.andThen(save).apply(user);;
 
 	private Function<UserAccountDTO, ResponseEntity<String>> criptoAndSaveDTO = (user) -> {
 		user.setPassword(cripto.apply(user.getPassword()));

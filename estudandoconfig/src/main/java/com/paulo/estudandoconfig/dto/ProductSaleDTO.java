@@ -7,6 +7,7 @@ public class ProductSaleDTO {
 	private Long id;
 	private Long productId;
 	private String productName;
+	private String name;
 	private Integer quantity;
 	public Long getId() {
 		return id;
@@ -34,6 +35,13 @@ public class ProductSaleDTO {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	
 	
 }

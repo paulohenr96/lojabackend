@@ -1,6 +1,7 @@
 package com.paulo.estudandoconfig.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +24,9 @@ public class ProductSale implements Serializable {
 	@ManyToOne
 	private Product product;
 	private Integer quantity;
-	
+	private String name;
+	private BigDecimal unitPrice;
+
 	public Long getId() {
 		return id;
 	}
@@ -41,6 +44,18 @@ public class ProductSale implements Serializable {
 	}
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public BigDecimal getUnitPrice() {
+		return unitPrice;
+	}
+	public void setUnitPrice(BigDecimal unitPrice) {
+		this.unitPrice = unitPrice;
 	}
 	
 	

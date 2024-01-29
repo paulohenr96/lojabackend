@@ -24,7 +24,7 @@ public class Sale implements Serializable{
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	
-	@OneToMany(cascade = CascadeType.PERSIST)
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<ProductSale> products;
 	private String buyer;
 	private LocalDateTime date;
@@ -70,10 +70,5 @@ public class Sale implements Serializable{
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-	public void calculateTotal() {
-		this.totalPrice=this.getProducts().stream()
-		.map(e -> e.getProduct().getPrice().multiply(BigDecimal.valueOf(e.getQuantity())))
-		.reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
-
-	}
+	
 }

@@ -13,12 +13,12 @@ import com.paulo.estudandoconfig.service.SaleService;
 @Configuration
 public class AppConfig {
 
-	
-	@Bean
-	public ProductService productService() {
-		return new ProductService();
-	}
-	
+//	
+//	@Bean
+//	public ProductService productService() {
+//		return new ProductService();
+//	}
+//	
 	@Bean
 	public ModelMapper modelMapper() {
 		return new ModelMapper();

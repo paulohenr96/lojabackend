@@ -20,13 +20,17 @@ import com.paulo.estudandoconfig.repository.SaleRepository;
 
 public class ProductService extends ContextHolder {
 
-	@Autowired
-	private ProductRepository repository;
-	@Autowired
-	private SaleRepository saleRepository;
+	public ProductService(ProductRepository repository, SaleRepository saleRepository, ModelMapper modelMapper) {
+		super();
+		this.repository = repository;
+		this.saleRepository = saleRepository;
+		this.modelMapper = modelMapper;
+	}
 
-	@Autowired
-	private ModelMapper modelMapper;
+	private final ProductRepository repository;
+	private final SaleRepository saleRepository;
+
+	private final ModelMapper modelMapper;
 
 	public String save(ProductDTO produtoDTO) {
 

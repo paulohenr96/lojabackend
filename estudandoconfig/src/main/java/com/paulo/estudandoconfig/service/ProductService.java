@@ -3,13 +3,13 @@ package com.paulo.estudandoconfig.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.InfoDTO;
@@ -18,7 +18,7 @@ import com.paulo.estudandoconfig.model.Product;
 import com.paulo.estudandoconfig.repository.ProductRepository;
 import com.paulo.estudandoconfig.repository.SaleRepository;
 
-public class ProductService {
+public class ProductService extends ContextHolder {
 
 	@Autowired
 	private ProductRepository repository;
@@ -33,7 +33,7 @@ public class ProductService {
 		Product map = modelMapper.map(produtoDTO, Product.class);
 		map.setId(null);
 		repository.save(map);
-		return "ok";
+		return "";
 	}
 
 	public Page<ProductDTO> getAll(PageRequest pageRequest) {
@@ -58,13 +58,13 @@ public class ProductService {
 
 	}
 
-	public ProductDTO deleteById(Long id) {
+	public ResponseEntity deleteById(Long id) {
 		// TODO Auto-generated method stub
 
 		return repository.findById(id).map((e) -> {
 			repository.deleteById(id);
-			return toDTO(e);
-		}).orElseThrow(() -> new RuntimeException("Product does not exist."));
+			return new ResponseEntity<>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
 	}
 
@@ -106,12 +106,12 @@ public class ProductService {
 	private BigDecimal income(Integer month) {
 		// TODO Auto-generated method stub
 
-		if (ContextHolder.isAdmin())
+		if (isAdmin())
 
 		{
 			return saleRepository.totalIncome(month);
 		}
-		String username = ContextHolder.getUsername();
+		String username = getUsername();
 		return saleRepository.totalIncome(month, username);
 	}
 

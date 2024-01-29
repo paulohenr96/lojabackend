@@ -19,7 +19,7 @@ import com.paulo.estudandoconfig.model.Sale;
 import com.paulo.estudandoconfig.repository.ProductRepository;
 import com.paulo.estudandoconfig.repository.SaleRepository;
 
-public class SaleService {
+public class SaleService extends ContextHolder {
 
 	@Autowired
 	private SaleRepository repository;
@@ -34,7 +34,7 @@ public class SaleService {
 		Sale sale = mapper.map(dto, Sale.class);
 		sale.getProducts()
 		.forEach(e -> e.setProduct(productRepository.findById(e.getProduct().getId()).get()));
-		sale.setOwner(ContextHolder.getUsername());
+		sale.setOwner(getUsername());
 		sale.getProducts().forEach(this::updateQuantity);
 		sale.calculateTotal();
 		sale.setDate(LocalDateTime.now());
@@ -56,7 +56,7 @@ public class SaleService {
 	}
 
 	public Page<SaleDTO> findAllByUsername(PageRequest of) {
-		return repository.findAllByOwner(of, ContextHolder.getUsername()).map(this::toDTO);
+		return repository.findAllByOwner(of, getUsername()).map(this::toDTO);
 	}
 
 	public String deleteById(Long id) {
@@ -69,7 +69,7 @@ public class SaleService {
 	
 
 	public ChartDTO saleChart(Integer year) {
-		return ContextHolder.isAdmin() ? buildChart(repository.chartSaleMonth(year)) : saleChartByUser(year, ContextHolder.getUsername());
+		return isAdmin() ? buildChart(repository.chartSaleMonth(year)) : saleChartByUser(year, getUsername());
 
 	}
 

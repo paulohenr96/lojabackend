@@ -18,6 +18,7 @@ public class ExcentionController {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ResponseBody
 	public ResponseEntity<String> handleException(RuntimeException e) {
-		return new ResponseEntity<String>(e.getMessage(),HttpStatus.BAD_REQUEST);
+		e.printStackTrace();
+		return new ResponseEntity<String>("Internal Server Error",HttpStatus.BAD_REQUEST);
 	}
 }

@@ -28,20 +28,31 @@ public class FilterAuthentication extends OncePerRequestFilter {
 //		showHeadersAndValues(request);
 
 //		String valueToken = request.getHeader("authorization");
-
-		
 		SecurityContextHolder.clearContext();
-		
-		
+
 		Optional.ofNullable(request.getHeader("authorization"))
-				.map(valueToken -> valueToken.replace(Constants.prefix, ""))
-				.map(JWTCreator::verifyToken)
-				.ifPresent(dto -> 
-						SecurityContextHolder.getContext()
-							.setAuthentication(new UsernamePasswordAuthenticationToken(dto.getSubject(), "",
+				.map(valueToken -> valueToken.replace(Constants.prefix, "")).map(JWTCreator::verifyToken)
+				.ifPresent(dto -> SecurityContextHolder.getContext()
+						.setAuthentication(new UsernamePasswordAuthenticationToken(dto.getSubject(), "",
 								dto.getRoles().stream().map(SimpleGrantedAuthority::new).toList())));
-		
-		
+//		String fullToken = request.getHeader("authorization");
+//		if (fullToken != null && !fullToken.trim().equals("")) {
+//			String valueToken = fullToken.replace(Constants.prefix, "");
+//			
+//			TokenDTO dto = JWTCreator.verifyToken(valueToken);
+//
+//			if (dto != null) {
+//				SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+//						dto.getSubject(), "", dto.getRoles().stream().map(SimpleGrantedAuthority::new).toList()));
+//			} else {
+//				SecurityContextHolder.clearContext();
+//
+//			}
+//		} else {
+//			System.out.println("Token Nulo");
+//			SecurityContextHolder.clearContext();
+//
+//		}
 		filterChain.doFilter(request, response);
 
 	}

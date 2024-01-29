@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.paulo.estudandoconfig.dto.ChartDTO;
 import com.paulo.estudandoconfig.dto.SaleDTO;
 import com.paulo.estudandoconfig.service.SaleService;
 
-@CrossOrigin(origins = "http://localhost:4200/")
+@CrossOrigin(origins ="http://localhost:4200/",
+allowCredentials ="true",
+methods = {RequestMethod.GET,RequestMethod.POST,RequestMethod.PUT,RequestMethod.DELETE})
 @Controller
 @RequestMapping("sales")
 public class SaleController {

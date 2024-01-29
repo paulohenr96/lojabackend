@@ -5,7 +5,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,32 +21,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.UserAccountDTO;
-import com.paulo.estudandoconfig.mapper.ProductMapper;
+import com.paulo.estudandoconfig.mapper.UserAccountMapper;
 import com.paulo.estudandoconfig.model.Metrics;
 import com.paulo.estudandoconfig.model.UserAccount;
 import com.paulo.estudandoconfig.repository.MetricRepository;
-import com.paulo.estudandoconfig.repository.RoleRepository;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
-import com.paulo.estudandoconfig.util.ControllerUtil;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200")
 
 @RestController
 @RequestMapping("users")
 
-public class UserController extends ControllerUtil {
-	@Autowired
-	private ModelMapper mapper;
+public class UserController extends ContextHolder {
+	
 
 	@Autowired
 	private UserAccountRepository repo;
 
-	@Autowired
-	private RoleRepository roleRepo;
+	
 
 	@Autowired
 	private MetricRepository metricsRepository;
 
+	@Autowired
+	private UserAccountMapper userMapper;
+	
 	@PostMapping
 	public ResponseEntity<String> newUser(@RequestBody UserAccountDTO user) {
 
@@ -74,13 +72,13 @@ public class UserController extends ControllerUtil {
 
 	@GetMapping
 	public ResponseEntity<List<UserAccountDTO>> getAll() {
-		return ResponseEntity.ok(repo.findAll().stream().map(ProductMapper::toDTO).toList());
+		return ResponseEntity.ok(repo.findAll().stream().map(userMapper::toDTO).toList());
 	}
 
 	@GetMapping("{id}")
 	public ResponseEntity<UserAccountDTO> getById(@PathVariable(name = "id") Long id) {
 		return repo.findById(id)
-				.map(ProductMapper::toDTO)
+				.map(userMapper::toDTO)
 				.map(ResponseEntity::ok)
 				.get();
 	}
@@ -105,7 +103,7 @@ public class UserController extends ControllerUtil {
 
 	@PostMapping("confirmpassword")
 	public ResponseEntity<String> confirmPassword(@RequestBody String password) {
-		String username = ContextHolder.getUsername();
+		String username = getUsername();
 		BiPredicate<String, String> matchPassword = (raw, crypto) -> new BCryptPasswordEncoder().matches(raw, crypto);
 		return matchPassword.test(password,
 								repo.findByUserName(username)
@@ -138,7 +136,7 @@ public class UserController extends ControllerUtil {
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	};
-	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> ProductMapper.toEntity.andThen(save).apply(user);;
+	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> userMapper.toEntity.andThen(save).apply(user);;
 	private Function<UserAccountDTO, ResponseEntity<String>> criptoAndSaveDTO = (user) -> {
 		user.setPassword(cripto.apply(user.getPassword()));
 		return saveDTO.apply(user);

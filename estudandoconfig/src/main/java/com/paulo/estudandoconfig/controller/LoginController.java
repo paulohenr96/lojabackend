@@ -15,7 +15,7 @@ import com.paulo.estudandoconfig.JWTCreator;
 import com.paulo.estudandoconfig.dto.LoginDTO;
 import com.paulo.estudandoconfig.dto.TokenDTO;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
-@CrossOrigin(origins ="http://localhost:4200/")
+@CrossOrigin(origins ="*")
 
 @Controller
 public class LoginController {
@@ -24,12 +24,11 @@ public class LoginController {
 	private UserAccountRepository repository;
 
 	@PostMapping("login")
-	public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO login) {
+	public ResponseEntity login(@RequestBody LoginDTO login) {
 
 		return repository.findByUserName(login.getUsername()).map((e) -> {
 			if (!new BCryptPasswordEncoder().matches(login.getPassword(), e.getPassword()))
-				return ResponseEntity.ok(new TokenDTO());
-
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			TokenDTO dto = new TokenDTO();
 			dto.setSubject(e.getUserName());
 			dto.setRoles(e.getRoles().stream().map(e2 -> e2.getName()).toList());
@@ -39,7 +38,7 @@ public class LoginController {
 			dto.setFullToken(token);
 			dto.setGoal(e.getMonthlyGoal());
 			return ResponseEntity.ok(dto);
-		}).orElse(ResponseEntity.ok(new TokenDTO()));
+		}).orElseGet(()->new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
 
 
 	}

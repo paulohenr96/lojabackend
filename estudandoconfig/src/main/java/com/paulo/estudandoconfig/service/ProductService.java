@@ -5,11 +5,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.InfoDTO;
@@ -18,10 +18,10 @@ import com.paulo.estudandoconfig.model.Product;
 import com.paulo.estudandoconfig.repository.ProductRepository;
 import com.paulo.estudandoconfig.repository.SaleRepository;
 
+@Service
 public class ProductService extends ContextHolder {
 
 	public ProductService(ProductRepository repository, SaleRepository saleRepository, ModelMapper modelMapper) {
-		super();
 		this.repository = repository;
 		this.saleRepository = saleRepository;
 		this.modelMapper = modelMapper;

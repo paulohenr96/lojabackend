@@ -40,32 +40,43 @@ public class Product implements Serializable {
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public Product setId(Long id) {
 		this.id = id;
+		return this;
+
 	}
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
+	public Product setName(String name) {
 		this.name = name;
+		return this;
+
 	}
 	public Integer getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(Integer quantity) {
+	public Product setQuantity(Integer quantity) {
 		this.quantity = quantity;
+		return this;
+
 	}
 	public BigDecimal getPrice() {
 		return price;
 	}
-	public void setPrice(BigDecimal price) {
+	public Product setPrice(BigDecimal price) {
 		this.price = price;
+		return this;
+
 	}
 	public String getCategory() {
 		return category;
 	}
-	public void setCategory(String category) {
+	public Product setCategory(String category) {
 		this.category = category;
+		
+		return this;
+		
 	}
 	@Override
 	public int hashCode() {

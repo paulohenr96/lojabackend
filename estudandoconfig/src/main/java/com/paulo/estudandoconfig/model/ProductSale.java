@@ -21,8 +21,7 @@ public class ProductSale implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	private Long id;
 	
-	@ManyToOne
-	private Product product;
+	private Long productId;
 	private Integer quantity;
 	private String name;
 	private BigDecimal unitPrice;
@@ -30,33 +29,46 @@ public class ProductSale implements Serializable {
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+
+	public ProductSale setId(Long id) {
 		this.id = id;
+		return this;
 	}
-	public Product getProduct() {
-		return product;
-	}
-	public void setProduct(Product product) {
-		this.product = product;
-	}
+
 	public Integer getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(Integer quantity) {
+
+	public ProductSale setQuantity(Integer quantity) {
 		this.quantity = quantity;
+		return this;
 	}
+
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
+
+	public ProductSale setName(String name) {
 		this.name = name;
+		return this;
 	}
+
 	public BigDecimal getUnitPrice() {
 		return unitPrice;
 	}
-	public void setUnitPrice(BigDecimal unitPrice) {
+
+	public ProductSale setUnitPrice(BigDecimal unitPrice) {
 		this.unitPrice = unitPrice;
+		return this;
 	}
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public ProductSale setProductId(Long productId) {
+		this.productId = productId;
+	return this;}
 	
 	
 	

@@ -62,7 +62,7 @@ public class SaleController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteById(@PathVariable(name = "id") Long id) {
 
-		return ResponseEntity.ok(service.deleteById(id));
+		return (service.deleteById(id));
 	}
 
 	@GetMapping("chart")

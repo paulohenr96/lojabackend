@@ -34,30 +34,35 @@ public class Sale implements Serializable{
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public Sale setId(Long id) {
 		this.id = id;
+		return this;
 	}
 	public List<ProductSale> getProducts() {
 		return products;
 	}
-	public void setProducts(List<ProductSale> products) {
+	public Sale setProducts(List<ProductSale> products) {
 		this.products = products;
+		return this;
 	}
 	public String getBuyer() {
 		return buyer;
 	}
-	public void setBuyer(String buyer) {
+	public Sale setBuyer(String buyer) {
 		this.buyer = buyer;
+		return this;
 	}
 	public LocalDateTime getDate() {
 		return date;
 	}
-	public void setDate(LocalDateTime date) {
+	public Sale setDate(LocalDateTime date) {
 		this.date = date;
+		return this;
 	}
 	
-	public void setTotalPrice(BigDecimal totalPrice) {
+	public Sale setTotalPrice(BigDecimal totalPrice) {
 		this.totalPrice = totalPrice;
+		return this;
 	}
 	public BigDecimal getTotalPrice() {
 		return totalPrice;
@@ -67,8 +72,9 @@ public class Sale implements Serializable{
 	public String getOwner() {
 		return owner;
 	}
-	public void setOwner(String owner) {
+	public Sale setOwner(String owner) {
 		this.owner = owner;
+		return this;
 	}
 	
 }

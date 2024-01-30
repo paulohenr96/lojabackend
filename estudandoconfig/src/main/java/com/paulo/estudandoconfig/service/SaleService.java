@@ -8,7 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.ChartDTO;
@@ -33,35 +34,31 @@ public class SaleService extends ContextHolder {
 	public String finishSale(SaleDTO dto) {
 		Sale sale = mapper.map(dto, Sale.class);
 
-		sale.getProducts().forEach(productSale -> 
-		{
-			Product product = productRepository.findById(productSale.getProduct().getId()).get();
-			updateQuantity(productSale,product);
+		sale.getProducts().forEach(productSale -> {
+			Product product = productRepository.findById(productSale.getProductId())
+					.orElseThrow(() -> new RuntimeException("The product doesnt exist."));
+			updateQuantity(productSale, product);
 			productSale.setUnitPrice(product.getPrice());
-			productSale.setProduct(null);
-			
+
 		});
 
 		sale.setOwner(getUsername());
 		calculateTotal(sale);
 		sale.setDate(LocalDateTime.now());
-		
+
 		repository.save(sale);
 		return "{}";
 	}
 
 	private void calculateTotal(Sale sale) {
 		sale.setTotalPrice(sale.getProducts().stream()
-				.map(psale -> psale
-						.getUnitPrice()
-						.multiply(BigDecimal
-											.valueOf(psale.getQuantity())))
+				.map(psale -> psale.getUnitPrice().multiply(BigDecimal.valueOf(psale.getQuantity())))
 				.reduce(BigDecimal.ZERO, (a, b) -> a.add(b)));
 
 	}
 
-	public void updateQuantity(ProductSale p,Product product) {
-		
+	private void updateQuantity(ProductSale p, Product product) {
+
 		if (product.getQuantity() < p.getQuantity()) {
 			throw new RuntimeException("Not enough product on stock");
 		}
@@ -77,9 +74,13 @@ public class SaleService extends ContextHolder {
 		return repository.findAllByOwner(of, getUsername()).map(this::toDTO);
 	}
 
-	public String deleteById(Long id) {
-		repository.deleteById(id);
-		return "{}";
+	public ResponseEntity deleteById(Long id) {
+		if (repository.existsById(id)) {
+			repository.deleteById(id);
+			return new ResponseEntity<>(HttpStatus.OK);
+
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	public ChartDTO saleChart(Integer year) {

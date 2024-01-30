@@ -20,40 +20,41 @@ public class SaleDTO {
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public SaleDTO setId(Long id) {
+		this.id = id;return this;
 	}
 	
 	public String getBuyer() {
 		return buyer;
 	}
-	public void setBuyer(String buyer) {
-		this.buyer = buyer;
+	public SaleDTO setBuyer(String buyer) {
+		this.buyer = buyer;return this;
 	}
 	public List<ProductSaleDTO> getProducts() {
 		return products;
 	}
-	public void setProducts(List<ProductSaleDTO> products) {
-		this.products = products;
+	public SaleDTO setProducts(List<ProductSaleDTO> products) {
+		this.products = products;return this;
 	}
 	public LocalDateTime getDate() {
 		return date;
 	}
-	public void setDate(LocalDateTime date) {
-		this.date = date;
+	public SaleDTO setDate(LocalDateTime date) {
+		this.date = date;return this;
 	}
 	
 	public BigDecimal getTotalPrice() {
 		return totalPrice;
 	}
-	public void setTotalPrice(BigDecimal totalPrice) {
-		this.totalPrice = totalPrice;
+	public SaleDTO setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;return this;
 	}
 	public String getOwner() {
 		return owner;
 	}
-	public void setOwner(String owner) {
-		this.owner = owner;
+
+	public SaleDTO setOwner(String owner) {
+		this.owner = owner;return this;
 	}
 	
 }

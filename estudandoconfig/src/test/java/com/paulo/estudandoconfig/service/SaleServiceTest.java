@@ -104,7 +104,22 @@ class SaleServiceTest {
 		assertThrows(RuntimeException.class, () -> service.finishSale(dto), "Not enough product on stock");
 
 	}
+	@Test
+	void finishSaleRuntimeExceptionProductNotFound() {
+		List<String> roles = List.of("admin");
+		Authentication authentication = new UsernamePasswordAuthenticationToken("admin", "",
+				roles.stream().map(SimpleGrantedAuthority::new).toList());
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
 
+		Product product = new Product().setId(1L).setQuantity(50).setName("calça").setPrice(BigDecimal.valueOf(90));
+		sale.getProducts().get(0).setQuantity(90);
+		when(productRepository.findById(1L)).thenReturn(Optional.empty());
+		when(mapper.map(dto, Sale.class)).thenReturn(sale);
+		assertThrows(RuntimeException.class, () -> service.finishSale(dto), "The product doesnt exist.");
+
+	}
 	@Test
 	void findAllSuccessful() {
 		List<Sale> sales = List.of(sale.setOwner("claudio").setId(1L).setDate(LocalDateTime.now())
@@ -208,7 +223,7 @@ class SaleServiceTest {
 
 	@Test
 	void saleChartByUser() {
-		List<int[]> y = new ArrayList();
+		List<int[]> y = new ArrayList<>();
 		y.add(new int[] { 1, 500 });
 		y.add(new int[] { 2, 300 });
 		y.add(new int[] { 4, 500 });
@@ -224,11 +239,7 @@ class SaleServiceTest {
 	@Test
 	void incomeByUsernameSuccessful() {
 		when(repository.totalIncome(anyInt(), anyString())).thenReturn(BigDecimal.valueOf(5400));
-		
-		
 		BigDecimal out = service.incomeByUsername(5, "paulo");
-		
-		
 		assertEquals(BigDecimal.valueOf(5400), out);
 		
 		

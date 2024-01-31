@@ -17,13 +17,12 @@ import jakarta.persistence.ManyToMany;
 @Entity
 public class UserAccount implements Serializable {
 
-	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3893489977033070350L;
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String name;
 	private String userName;
@@ -32,43 +31,65 @@ public class UserAccount implements Serializable {
 
 	@ManyToMany
 	private Set<Role> roles;
-	
+
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+
+	public UserAccount setId(Long id) {
 		this.id = id;
+		return this;
+
 	}
+
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
+
+	public UserAccount setName(String name) {
 		this.name = name;
+		return this;
+
 	}
+
 	public String getUserName() {
 		return userName;
 	}
-	public void setUserName(String userName) {
+
+	public UserAccount setUserName(String userName) {
 		this.userName = userName;
+		return this;
+
 	}
+
 	public String getPassword() {
 		return password;
 	}
-	public void setPassword(String password) {
+
+	public UserAccount setPassword(String password) {
 		this.password = password;
+		return this;
+
 	}
-	
+
 	public Set<Role> getRoles() {
 		return roles;
 	}
-	public void setRoles(Set<Role> roles) {
+
+	public UserAccount setRoles(Set<Role> roles) {
 		this.roles = roles;
+		return this;
+
 	}
+
 	public BigDecimal getMonthlyGoal() {
 		return monthlyGoal;
 	}
-	public void setMonthlyGoal(BigDecimal monthlyGoal) {
+
+	public UserAccount setMonthlyGoal(BigDecimal monthlyGoal) {
 		this.monthlyGoal = monthlyGoal;
+		return this;
+
 	}
-	
+
 }

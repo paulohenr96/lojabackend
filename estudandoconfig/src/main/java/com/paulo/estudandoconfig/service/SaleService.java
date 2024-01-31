@@ -42,19 +42,8 @@ public class SaleService extends ContextHolder {
 
 		});
 
-		sale.setOwner(getUsername());
-		calculateTotal(sale);
-		sale.setDate(LocalDateTime.now());
-
-		repository.save(sale);
+		repository.save(sale.setOwner(getUsername()).calculateTotal().setDate(LocalDateTime.now()));
 		return "{}";
-	}
-
-	private void calculateTotal(Sale sale) {
-		sale.setTotalPrice(sale.getProducts().stream()
-				.map(psale -> psale.getUnitPrice().multiply(BigDecimal.valueOf(psale.getQuantity())))
-				.reduce(BigDecimal.ZERO, (a, b) -> a.add(b)));
-
 	}
 
 	private void updateQuantity(ProductSale p, Product product) {

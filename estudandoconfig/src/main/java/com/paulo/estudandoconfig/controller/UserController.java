@@ -138,7 +138,6 @@ public class UserController extends ContextHolder {
 	};
 	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> userMapper.toEntity.andThen(save).apply(user);;
 	private Function<UserAccountDTO, ResponseEntity<String>> criptoAndSaveDTO = (user) -> {
-		user.setPassword(cripto.apply(user.getPassword()));
-		return saveDTO.apply(user);
+		return saveDTO.apply(user.setPassword(cripto.apply(user.getPassword())));
 	};
 }

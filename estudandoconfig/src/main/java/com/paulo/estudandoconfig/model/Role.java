@@ -26,16 +26,18 @@ public class Role implements Serializable{
 		return id;
 	}
 
-	public void setId(Long id) {
+	public Role setId(Long id) {
 		this.id = id;
+		return this;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public Role setName(String name) {
 		this.name = name;
+		return this;
 	}
 	
 

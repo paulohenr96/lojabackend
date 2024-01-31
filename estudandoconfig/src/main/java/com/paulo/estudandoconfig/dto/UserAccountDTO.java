@@ -14,40 +14,63 @@ public class UserAccountDTO {
 	private BigDecimal monthlyGoal;
 
 	private List<String> rolesName;
+
 	public String getUserName() {
 		return userName;
 	}
-	public void setUserName(String userName) {
+
+	public UserAccountDTO setUserName(String userName) {
 		this.userName = userName;
+		return this;
+
 	}
+
 	public String getPassword() {
 		return password;
 	}
-	public void setPassword(String password) {
+
+	public UserAccountDTO setPassword(String password) {
 		this.password = password;
+		return this;
+
 	}
+
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
+
+	public UserAccountDTO setName(String name) {
 		this.name = name;
+		return this;
+
 	}
+
 	public List<String> getRolesName() {
 		return rolesName;
 	}
-	public void setRolesName(List<String> roles) {
+
+	public UserAccountDTO setRolesName(List<String> roles) {
 		this.rolesName = roles;
+		return this;
+
 	}
-	public void setId(Long id) {
+
+	public UserAccountDTO setId(Long id) {
 		this.id = id;
+		return this;
+
 	}
+
 	public Long getId() {
 		return id;
 	}
+
 	public BigDecimal getMonthlyGoal() {
 		return monthlyGoal;
 	}
-	public void setMonthlyGoal(BigDecimal monthlyGoal) {
+
+	public UserAccountDTO setMonthlyGoal(BigDecimal monthlyGoal) {
 		this.monthlyGoal = monthlyGoal;
+		return this;
 	}
 }

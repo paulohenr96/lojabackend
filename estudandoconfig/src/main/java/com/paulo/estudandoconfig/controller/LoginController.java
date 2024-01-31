@@ -15,13 +15,19 @@ import com.paulo.estudandoconfig.JWTCreator;
 import com.paulo.estudandoconfig.dto.LoginDTO;
 import com.paulo.estudandoconfig.dto.TokenDTO;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
-@CrossOrigin(origins ="*")
+
+@CrossOrigin(origins = "*")
 
 @Controller
 public class LoginController {
 
-	@Autowired
-	private UserAccountRepository repository;
+	
+	public LoginController(UserAccountRepository repository) {
+		super();
+		this.repository = repository;
+	}
+
+	private final UserAccountRepository repository;
 
 	@PostMapping("login")
 	public ResponseEntity login(@RequestBody LoginDTO login) {
@@ -29,17 +35,13 @@ public class LoginController {
 		return repository.findByUserName(login.getUsername()).map((e) -> {
 			if (!new BCryptPasswordEncoder().matches(login.getPassword(), e.getPassword()))
 				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-			TokenDTO dto = new TokenDTO();
-			dto.setSubject(e.getUserName());
-			dto.setRoles(e.getRoles().stream().map(e2 -> e2.getName()).toList());
-			
-			
-			String token = JWTCreator.newToken(dto);
-			dto.setFullToken(token);
-			dto.setGoal(e.getMonthlyGoal());
-			return ResponseEntity.ok(dto);
-		}).orElseGet(()->new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+			TokenDTO dto = new TokenDTO().setSubject(e.getUserName())
+					.setRoles(e.getRoles().stream().map(e2 -> e2.getName()).toList());
 
+			String token = JWTCreator.newToken(dto);
+			dto.setFullToken(token).setGoal(e.getMonthlyGoal());
+			return ResponseEntity.ok(dto);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
 
 	}
 

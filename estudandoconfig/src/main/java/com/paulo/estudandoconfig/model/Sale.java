@@ -31,6 +31,17 @@ public class Sale implements Serializable{
 	private BigDecimal totalPrice;
 	private String owner;
 	
+	
+	
+	public Sale calculateTotal() {
+		this.setTotalPrice(this.getProducts().stream()
+				.map(psale -> psale.getUnitPrice().multiply(BigDecimal.valueOf(psale.getQuantity())))
+				.reduce(BigDecimal.ZERO, (a, b) -> a.add(b)));
+		
+		return this;
+	}
+	
+	
 	public Long getId() {
 		return id;
 	}

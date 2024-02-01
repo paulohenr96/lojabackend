@@ -35,22 +35,36 @@ import com.paulo.estudandoconfig.repository.UserAccountRepository;
 public class UserController extends ContextHolder {
 	
 
-	@Autowired
+	public UserController(UserAccountRepository repo, MetricRepository metricsRepository,
+			UserAccountMapper userMapper) {
+		super();
+		this.repo = repo;
+		this.metricsRepository = metricsRepository;
+		this.userMapper = userMapper;
+	}
+
 	private UserAccountRepository repo;
 
 	
 
-	@Autowired
 	private MetricRepository metricsRepository;
 
-	@Autowired
 	private UserAccountMapper userMapper;
 	
 	@PostMapping
 	public ResponseEntity<String> newUser(@RequestBody UserAccountDTO user) {
 
 		return repo.findByUserName(user.getUserName()).map((e) -> ResponseEntity.ok(("Invalid Username")))
-				.orElseGet(() -> criptoAndSaveDTO.apply(user));
+				.orElseGet(() -> {
+					
+					
+					UserAccount entity = userMapper.toEntity((user.setPassword(cripto.apply(user.getPassword()))));
+					
+					repo.save(entity);
+					return new ResponseEntity<>(HttpStatus.OK);
+					
+					
+				});
 	}
 
 	@PutMapping
@@ -129,15 +143,20 @@ public class UserController extends ContextHolder {
 				return new ResponseEntity(HttpStatus.CONFLICT);
 		}
 		userDTO.setPassword(user.getPassword());
-		return saveDTO.apply(userDTO);
+		return saveDTO(userDTO);
 	}
 	private Function<UserAccount, ResponseEntity<String>> save = user -> {
 		repo.save(user);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	};
-	private Function<UserAccountDTO, ResponseEntity<String>> saveDTO = (user) -> userMapper.toEntity.andThen(save).apply(user);;
+	private  ResponseEntity<String> saveDTO (UserAccountDTO user){
+		UserAccount entity = userMapper.toEntity(user);
+		
+		return (save).apply(entity);
+		
+	} 
 	private Function<UserAccountDTO, ResponseEntity<String>> criptoAndSaveDTO = (user) -> {
-		return saveDTO.apply(user.setPassword(cripto.apply(user.getPassword())));
+		return saveDTO(user.setPassword(cripto.apply(user.getPassword())));
 	};
 }

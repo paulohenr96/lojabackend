@@ -29,8 +29,9 @@ public class UserAccountMapper {
 		return names.stream().map(name -> roleRepo.findByName(name)).map(Optional::get).collect(Collectors.toSet());
 	}
 
-	public Function<UserAccountDTO, UserAccount> toEntity = (user) -> mapper.map(user, UserAccount.class)
-			.setRoles(rolesNamesToObjects(user.getRolesName()));;
+	public UserAccount toEntity(UserAccountDTO user) {
+		return mapper.map(user, UserAccount.class).setRoles(rolesNamesToObjects(user.getRolesName()));
+	}
 
 	public UserAccountDTO toDTO(UserAccount user) {
 

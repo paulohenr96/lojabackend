@@ -1,5 +1,6 @@
 package com.paulo.estudandoconfig.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -69,7 +70,18 @@ public class UserController extends ContextHolder {
 
 	@PutMapping
 	public ResponseEntity edit(@RequestBody UserAccountDTO userDTO) {
-		return repo.findById(userDTO.getId()).map(user -> checkUsername(userDTO, user))
+		return repo.findById(userDTO.getId()).map(user -> {
+			
+			boolean usernameChanged = !user.getUserName().equalsIgnoreCase(userDTO.getUserName());
+			if (usernameChanged) {
+				boolean existUserWithSameUsername = repo.findByUserName(userDTO.getUserName()).isPresent();
+				if (existUserWithSameUsername)
+					return new ResponseEntity<>(HttpStatus.CONFLICT);
+			}
+			userDTO.setPassword(user.getPassword());
+			return saveDTO(userDTO);
+			
+		})
 				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
 	}
@@ -94,7 +106,7 @@ public class UserController extends ContextHolder {
 		return repo.findById(id)
 				.map(userMapper::toDTO)
 				.map(ResponseEntity::ok)
-				.get();
+				.orElseGet(()-> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@DeleteMapping("{id}")
@@ -128,7 +140,11 @@ public class UserController extends ContextHolder {
 
 	@PutMapping("metrics")
 	public ResponseEntity<Metrics> editMetrics(@RequestBody Metrics m) {
+		if (m.getMonthlyGoal().compareTo(BigDecimal.ZERO)==-1) {
+			return 	new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
+
+		}
 		metricsRepository.save(m);
 		return ResponseEntity.ok(m);
 	}

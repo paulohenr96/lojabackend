@@ -24,22 +24,24 @@ public class Metrics implements Serializable{
 	private Long id;
 	
 	
-	private BigDecimal monthlyGoal;
+	private BigDecimal monthlyGoal=BigDecimal.valueOf(0);
 
 	public BigDecimal getMonthlyGoal() {
 		return monthlyGoal;
 	}
 
-	public void setMonthlyGoal(BigDecimal monthlyGoal) {
+	public Metrics setMonthlyGoal(BigDecimal monthlyGoal) {
 		this.monthlyGoal = monthlyGoal;
+		return this;
 	}
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public Metrics setId(Long id) {
+		this.id = id;		return this;
+
 	}
 	
 }

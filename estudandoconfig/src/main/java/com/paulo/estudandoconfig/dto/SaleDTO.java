@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class SaleDTO {
 	
@@ -55,6 +56,21 @@ public class SaleDTO {
 
 	public SaleDTO setOwner(String owner) {
 		this.owner = owner;return this;
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SaleDTO other = (SaleDTO) obj;
+		return Objects.equals(id, other.id);
 	}
 	
 }

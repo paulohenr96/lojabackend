@@ -29,8 +29,11 @@ methods = {RequestMethod.GET,RequestMethod.POST,RequestMethod.PUT,RequestMethod.
 @RequestMapping("sales")
 public class SaleController {
 
-	@Autowired
-	private SaleService service;
+	public SaleController(SaleService service) {
+		super();
+		this.service = service;
+	}
+	private final SaleService service;
 
 	@PostMapping
 	public ResponseEntity<String> save(@RequestBody SaleDTO dto) {

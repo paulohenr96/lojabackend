@@ -28,7 +28,11 @@ import com.paulo.estudandoconfig.service.ProductService;
 @RequestMapping("products")
 public class ProductController {
 
-	@Autowired
+	public ProductController(ProductService service) {
+		super();
+		this.service = service;
+	}
+
 	private ProductService service;
 
 	@PostMapping

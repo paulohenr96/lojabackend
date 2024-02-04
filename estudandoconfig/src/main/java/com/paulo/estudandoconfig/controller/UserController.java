@@ -55,6 +55,10 @@ public class UserController extends ContextHolder {
 	@PostMapping
 	public ResponseEntity<String> newUser(@RequestBody UserAccountDTO user) {
 
+		
+		
+		
+		
 		return repo.findByUserName(user.getUserName()).map((e) -> ResponseEntity.ok(("Invalid Username")))
 				.orElseGet(() -> {
 					
@@ -150,17 +154,7 @@ public class UserController extends ContextHolder {
 	}
 
 	private UnaryOperator<String> cripto = raw -> new BCryptPasswordEncoder().encode(raw);
-	private ResponseEntity<String> checkUsername(UserAccountDTO userDTO, UserAccount user) {
-
-		boolean usernameChanged = !user.getUserName().equalsIgnoreCase(userDTO.getUserName());
-		if (usernameChanged) {
-			boolean existUserWithSameUsername = repo.findByUserName(userDTO.getUserName()).isPresent();
-			if (existUserWithSameUsername)
-				return new ResponseEntity(HttpStatus.CONFLICT);
-		}
-		userDTO.setPassword(user.getPassword());
-		return saveDTO(userDTO);
-	}
+	 
 	private Function<UserAccount, ResponseEntity<String>> save = user -> {
 		repo.save(user);
 		return new ResponseEntity<>(HttpStatus.OK);

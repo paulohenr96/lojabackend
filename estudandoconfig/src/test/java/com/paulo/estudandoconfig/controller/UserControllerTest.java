@@ -233,11 +233,18 @@ class UserControllerTest {
 
 		Long id=1L;
 		
-		UserAccountDTO dto = new UserAccountDTO().setUserName("arc").setName("Claudio").setRolesName(List.of("admin"))
+		UserAccountDTO dto = new UserAccountDTO()
+				.setUserName("arc")
+				.setName("Claudio")
+				.setRolesName(List.of("admin"))
 				.setId(1L).setPassword(("123"));
 
-		UserAccount user = new UserAccount().setUserName("admin").setId(1L).setName("Pedro")
-				.setRoles(Set.of(new Role().setName("admin"))).setPassword(("123"));
+		UserAccount user = new UserAccount()
+				.setUserName("admin")
+				.setId(1L).setName("Pedro")
+				.setRoles(Set.of(new Role()
+						.setName("admin")))
+				.setPassword(("123"));
 
 		when(userMapper.toDTO(any(UserAccount.class))).thenReturn(dto);
 		when(repository.findById(anyLong())).thenReturn(Optional.of(user));

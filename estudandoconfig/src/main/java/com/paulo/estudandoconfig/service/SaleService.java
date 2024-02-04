@@ -69,7 +69,7 @@ public class SaleService extends ContextHolder {
 			return new ResponseEntity<>(HttpStatus.OK);
 
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>("Entity not found",HttpStatus.NOT_FOUND);
 	}
 
 	public ChartDTO saleChart(Integer year) {

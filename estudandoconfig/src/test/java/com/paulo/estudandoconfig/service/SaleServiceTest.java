@@ -171,6 +171,7 @@ class SaleServiceTest {
 		when(repository.existsById(anyLong())).thenReturn(false);
 		ResponseEntity out = service.deleteById(1L);
 		assertEquals(HttpStatus.NOT_FOUND, out.getStatusCode());
+		assertEquals("Entity not found", out.getBody());
 	}
 
 	@Test

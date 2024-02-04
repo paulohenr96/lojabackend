@@ -2,12 +2,10 @@ package com.paulo.estudandoconfig.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +14,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
 import com.paulo.estudandoconfig.service.ProductService;
 
 @CrossOrigin(origins = "http://localhost:4200/")
-@Controller
+@RestController
 @RequestMapping("products")
 public class ProductController {
 
@@ -57,13 +55,13 @@ public class ProductController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO p, @PathVariable("id") Long id) {
+	public ResponseEntity<ProductDTO> updateProduct(@PathVariable("id") Long id,@RequestBody ProductDTO p) {
 		return ResponseEntity.ok(service.updateById(p, id));
 	}
 
 	@PreAuthorize("hasAuthority('admin')")
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ProductDTO> deleteProduct(@PathVariable("id") Long id) {
+	public ResponseEntity deleteProduct(@PathVariable("id") Long id) {
 
 		return service.deleteById(id);
 	}

@@ -98,10 +98,11 @@ public class ProductService extends ContextHolder {
 
 	private ProductDTO update(Product product, ProductDTO p) {
 
-		product.setName(p.getName());
-		product.setQuantity(p.getQuantity());
-		product.setPrice(p.getPrice());
-		product.setCategory(p.getCategory());
+		product
+		.setName(p.getName())
+		.setQuantity(p.getQuantity())
+		.setPrice(p.getPrice())
+		.setCategory(p.getCategory());
 
 		Product save = repository.save(product);
 		return toDTO(save);

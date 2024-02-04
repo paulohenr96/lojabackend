@@ -11,32 +11,32 @@ public class ProductDTO {
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public ProductDTO setName(String name) {
+		this.name = name;return this;
 	}
 	public Integer getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
+	public ProductDTO setQuantity(Integer quantity) {
+		this.quantity = quantity;return this;
 	}
 	public BigDecimal getPrice() {
 		return price;
 	}
-	public void setPrice(BigDecimal price) {
-		this.price = price;
+	public ProductDTO setPrice(BigDecimal price) {
+		this.price = price;return this;
 	}
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public ProductDTO setId(Long id) {
+		this.id = id;return this;
 	}
 	public String getCategory() {
 		return category;
 	}
-	public void setCategory(String category) {
-		this.category = category;
+	public ProductDTO setCategory(String category) {
+		this.category = category;return this;
 	}
 	
 	

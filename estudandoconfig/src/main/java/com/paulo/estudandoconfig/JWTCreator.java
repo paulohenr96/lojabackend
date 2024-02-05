@@ -13,51 +13,31 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 public class JWTCreator {
-	
-	
-	
+
 	public static String newToken(TokenDTO t) {
-		
+
 		JwtBuilder builder = Jwts.builder();
 		JwtBuilder claim = builder.setSubject(t.getSubject()).claim("roles", t.getRoles());
-		
-		String compact = setDates(claim)
-				.signWith(SignatureAlgorithm.HS256,Constants.SECRET_KEY)
-				.compact();
+
+		String compact = setDates(claim).signWith(SignatureAlgorithm.HS256, Constants.SECRET_KEY).compact();
 		return Constants.prefix.concat(compact);
-			
-		
+
 	}
-	
-	
-	
+
 	public static TokenDTO verifyToken(String token) {
-		TokenDTO t=new TokenDTO();
-		
-		
-		Claims body = Jwts.parserBuilder()
-				.setSigningKey(Constants.SECRET_KEY)
-				.build()
-				.parseClaimsJws(token)
-				.getBody();
+		TokenDTO t = new TokenDTO();
+
+		Claims body = Jwts.parserBuilder().setSigningKey(Constants.SECRET_KEY).build().parseClaimsJws(token).getBody();
 		boolean before = body.getIssuedAt().before(new Date());
-		if (before) {
-			t.setRoles((List<String>)body.get("roles"));
-			t.setSubject(body.getSubject());
-			return t;
-		}
-		return null;
+		t.setRoles((List<String>) body.get("roles"));
+		t.setSubject(body.getSubject());
+		return t;
 	}
-	
-	
-	
-	
-	
+
 	private static JwtBuilder setDates(JwtBuilder claim) {
-		Date now= Date.from(Instant.now());
+		Date now = Date.from(Instant.now());
 		JwtBuilder setIssuedAt = claim.setIssuedAt(now);
-		return setIssuedAt.setExpiration(new Date(System.currentTimeMillis()+Constants.duration));
+		return setIssuedAt.setExpiration(new Date(System.currentTimeMillis() + Constants.duration));
 	}
-	
 
 }

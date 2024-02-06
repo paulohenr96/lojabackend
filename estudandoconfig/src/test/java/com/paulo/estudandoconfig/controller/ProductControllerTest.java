@@ -1,6 +1,9 @@
 package com.paulo.estudandoconfig.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -15,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,12 +30,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
+import com.paulo.estudandoconfig.exception.ExcentionController;
 import com.paulo.estudandoconfig.service.ProductService;
+
+import jakarta.servlet.ServletException;
 
 @WebMvcTest(controllers = ProductController.class)
 class ProductControllerTest {
@@ -44,7 +52,7 @@ class ProductControllerTest {
 		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 		String url = "/products";
 
-		ProductDTO dto = new ProductDTO().setName("Socks").setPrice(BigDecimal.valueOf(9000)).setCategory("clothe")
+		ProductDTO dto = new ProductDTO().setName("Socks").setPrice(BigDecimal.valueOf(9000)).setCategory("clothes")
 				.setQuantity(90);
 		when(service.save(dto)).thenReturn("");
 
@@ -55,6 +63,28 @@ class ProductControllerTest {
 				.andReturn();
 		assertEquals(200, result.getResponse().getStatus());
 		assertEquals("", result.getResponse().getContentAsString());
+
+	}
+
+	@Test
+	void saveProductBlankCategory() throws JsonProcessingException, Exception {
+		ProductController controller = new ProductController(service);
+		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
+				.build();
+		String url = "/products";
+
+		ProductDTO dto = new ProductDTO().setPrice(BigDecimal.valueOf(-9000)).setQuantity(-90);
+		when(service.save(dto)).thenReturn("");
+
+		// Act
+//		when(userMapper.toEntity(user)).
+
+		mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$").value(Matchers.hasItem("Insert a category")))
+				.andExpect(jsonPath("$").value(Matchers.hasItem("The quantity should not be negative")))
+				.andExpect(jsonPath("$").value(Matchers.hasItem("The price should not be negative")))
+				.andExpect(jsonPath("$").value(Matchers.hasItem("Insert the name"))).andExpect(status().isBadRequest());
 
 	}
 
@@ -72,7 +102,28 @@ class ProductControllerTest {
 		// Act
 //		when(userMapper.toEntity(user)).
 
-		mockMvc.perform(get(url)).andExpect(jsonPath("$.content[0].name").value("Socks")).andExpect(status().isOk());
+		mockMvc.perform(get(url).param("page", "0")).andExpect(jsonPath("$.content[0].name").value("Socks"))
+				.andExpect(status().isOk());
+
+	}
+
+	@Test
+	void getAllNegativePage() throws JsonProcessingException, Exception {
+		ProductController controller = new ProductController(service);
+		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
+				.setValidator(new LocalValidatorFactoryBean()).build();
+		String url = "/products";
+
+		ProductDTO dto = new ProductDTO().setName("Socks").setPrice(BigDecimal.valueOf(9000)).setCategory("clothe")
+				.setQuantity(90);
+
+		when(service.getAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(dto)));
+
+		// Act
+//		when(userMapper.toEntity(user)).
+		MvcResult result = mockMvc.perform(get(url).param("page", "-1")).andReturn();
+
+		assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
 
 	}
 
@@ -100,117 +151,112 @@ class ProductControllerTest {
 	void updateSuccessful() throws JsonProcessingException, Exception {
 		ProductController controller = new ProductController(service);
 		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-		
+
 		String url = "/products";
-		
+
 		Long id = 1L;
 		String category = "clothes";
-		
+
 		ProductDTO dto = new ProductDTO().setName("Socks")
 
 				.setPrice(BigDecimal.valueOf(9000)).setCategory("clothes").setQuantity(90);
 
 		when(service.updateById(any(ProductDTO.class), anyLong())).thenReturn(dto);
 
+		mockMvc.perform(put(url + "/" + id).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
 
-		mockMvc.perform(put(url+"/"+id)
-				.contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
-				
 				.andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Socks"));
 
 	}
+
 	@Test
 	void deteleSuccessful() throws JsonProcessingException, Exception {
 		ProductController controller = new ProductController(service);
 		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-		
+
 		String url = "/products";
-		
+
 		Long id = 1L;
 		String category = "clothes";
-		
+
 		ProductDTO dto = new ProductDTO().setName("Socks")
 
 				.setPrice(BigDecimal.valueOf(9000)).setCategory("clothes").setQuantity(90);
 
 		when(service.deleteById(anyLong())).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
+		mockMvc.perform(delete(url + "/" + id))
 
-		mockMvc.perform(delete(url+"/"+id))
-				
 				.andExpect(status().isOk());
 
 	}
+
 	@Test
 	void findByIdSuccessful() throws JsonProcessingException, Exception {
 		ProductController controller = new ProductController(service);
 		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-		
+
 		String url = "/products";
-		
+
 		Long id = 1L;
 		String category = "clothes";
-		
+
 		ProductDTO dto = new ProductDTO().setName("Socks")
 
 				.setPrice(BigDecimal.valueOf(9000)).setCategory("clothes").setQuantity(90);
 
 		when(service.findById(anyLong())).thenReturn(dto);
 
+		mockMvc.perform(get(url + "/" + id))
 
-		mockMvc.perform(get(url+"/"+id))
-				
-				
 				.andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Socks"));
 
 	}
-	
+
 	@Test
 	void countProductSuccessful() throws JsonProcessingException, Exception {
 		ProductController controller = new ProductController(service);
 		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-		
+
 		String url = "/products";
-		
+
 		Long id = 1L;
 		String category = "clothes";
-		
+
 		ProductDTO dto = new ProductDTO().setName("Socks")
 
 				.setPrice(BigDecimal.valueOf(9000)).setCategory("clothes").setQuantity(90);
 		;
-		when(service.info()).thenReturn(new InfoDTO(BigDecimal.valueOf(400),500L,50));
+		when(service.info()).thenReturn(new InfoDTO(BigDecimal.valueOf(400), 500L, 50));
 
+		mockMvc.perform(get(url + "/infos"))
 
-		mockMvc.perform(get(url+"/infos"))
-				
-				
 				.andExpect(status().isOk()).andExpect(jsonPath("$.income").value("400"));
 
 	}
+
 	@Test
 	void checkQuantitySuccessful() throws JsonProcessingException, Exception {
 		ProductController controller = new ProductController(service);
 		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-		
+
 		String url = "/products";
-		
+
 		Long id = 1L;
 		String category = "clothes";
-		
+
 		ProductDTO dto = new ProductDTO().setName("Socks")
 
 				.setPrice(BigDecimal.valueOf(9000)).setCategory("clothes").setQuantity(90);
 		;
 		when(service.checkQuantity()).thenReturn(List.of(dto));
 
+		mockMvc.perform(get(url + "/checkquantity"))
 
-		mockMvc.perform(get(url+"/checkquantity"))
-				
-				
 				.andExpect(status().isOk()).andExpect(jsonPath("$.[0].name").value("Socks"));
 
 	}
+
 	String toJson(Object o) throws JsonProcessingException {
 		return new ObjectMapper().writeValueAsString(o);
 	}

@@ -2,11 +2,24 @@ package com.paulo.estudandoconfig.dto;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
 public class ProductDTO {
 	private Long id;
+	
+	
+	@NotBlank(message="Insert the name")
 	private String name;
+	
+	
+	@Min(value=0,message = "The quantity should not be negative")
 	private Integer quantity;
+	
+	@Min(value=0,message = "The price should not be negative")
 	private BigDecimal price;
+	
+	@NotBlank(message="Insert a category")
 	private String category;
 
 	public String getName() {

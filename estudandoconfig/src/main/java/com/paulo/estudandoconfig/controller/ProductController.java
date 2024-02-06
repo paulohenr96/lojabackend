@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,10 @@ import com.paulo.estudandoconfig.dto.InfoDTO;
 import com.paulo.estudandoconfig.dto.ProductDTO;
 import com.paulo.estudandoconfig.service.ProductService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
 @CrossOrigin(origins = "http://localhost:4200/")
 @RestController
 @RequestMapping("products")
@@ -34,14 +39,17 @@ public class ProductController {
 	private ProductService service;
 
 	@PostMapping
-	public ResponseEntity<String> saveProduct(@RequestBody ProductDTO dto) {
+	public ResponseEntity<String> saveProduct(@Valid @RequestBody ProductDTO dto) {
 
 		service.save(dto);
 		return ResponseEntity.ok("");
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<ProductDTO>> getAll(@RequestParam(name = "page", defaultValue = "0") Integer page,
+	@Valid
+	public ResponseEntity<Page<ProductDTO>> getAll
+	( @Min(value=0,message ="{page.notnegative}") @RequestParam(name = "page", defaultValue = "0") 
+	 Integer page,
 			@RequestParam(name = "size", defaultValue = "3") Integer size) {
 		return ResponseEntity.ok(service.getAll(PageRequest.of(page, size)));
 	}
@@ -50,7 +58,7 @@ public class ProductController {
 	public ResponseEntity<Page<ProductDTO>> getAllByCategory(
 			@RequestParam(name = "page", defaultValue = "0") Integer page,
 			@RequestParam(name = "size", defaultValue = "3") Integer size,
-			@PathVariable(name = "category") String category) {
+			@PathVariable(name = "category")@NotBlank String category ) {
 		return ResponseEntity.ok(service.getAll(PageRequest.of(page, size), category));
 	}
 

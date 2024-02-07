@@ -1,6 +1,5 @@
 package com.paulo.estudandoconfig.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +15,8 @@ import com.paulo.estudandoconfig.dto.LoginDTO;
 import com.paulo.estudandoconfig.dto.TokenDTO;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
 
+import jakarta.validation.Valid;
+
 @CrossOrigin(origins = "*")
 
 @Controller
@@ -30,7 +31,7 @@ public class LoginController {
 	private final UserAccountRepository repository;
 
 	@PostMapping("login")
-	public ResponseEntity login(@RequestBody LoginDTO login) {
+	public ResponseEntity login(@Valid @RequestBody LoginDTO login) {
 
 		return repository.findByUserName(login.getUsername()).map((e) -> {
 			if (!new BCryptPasswordEncoder().matches(login.getPassword(), e.getPassword()))

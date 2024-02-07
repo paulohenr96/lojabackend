@@ -16,9 +16,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.PageImpl;
@@ -26,7 +27,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -45,8 +45,10 @@ class ProductControllerTest {
 	@MockBean
 	ProductService service;
 
-	@Test
-	void saveProductValidator() throws JsonProcessingException, Exception {
+	MockMvc mockMvc;
+	
+	@BeforeEach
+	void setUp() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasename("classpath:messages");
 		messageSource.setDefaultEncoding("UTF-8");
@@ -55,9 +57,14 @@ class ProductControllerTest {
 		bean.setValidationMessageSource(messageSource);
 
 		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
+		mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
 				.setValidator(bean) // Configurar o validador aqui
 				.build();
+	}
+	
+	@Test
+	void saveProductValidator() throws JsonProcessingException, Exception {
+	
 
 		String url = "/products";
 
@@ -78,8 +85,7 @@ class ProductControllerTest {
 
 	@Test
 	void saveProductSuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+		
 		String url = "/products";
 
 		ProductDTO dto = new ProductDTO().setName("Socks").setPrice(BigDecimal.valueOf(9000)).setCategory("clothes")
@@ -98,8 +104,7 @@ class ProductControllerTest {
 
 	@Test
 	void getAllSuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+		
 		String url = "/products";
 
 		ProductDTO dto = new ProductDTO().setName("Socks").setPrice(BigDecimal.valueOf(9000)).setCategory("clothe")
@@ -117,9 +122,6 @@ class ProductControllerTest {
 
 	@Test
 	void getAllNegativePage() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
-				.setValidator(new LocalValidatorFactoryBean()).build();
 		String url = "/products";
 
 		ProductDTO dto = new ProductDTO().setName("Socks").setPrice(BigDecimal.valueOf(9000)).setCategory("clothe")
@@ -137,8 +139,6 @@ class ProductControllerTest {
 
 	@Test
 	void getAllByCategorySuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 		String url = "/products";
 		String category = "clothes";
 		ProductDTO dto = new ProductDTO().setName("Socks").setPrice(BigDecimal.valueOf(9000)).setCategory("clothes")
@@ -157,8 +157,6 @@ class ProductControllerTest {
 
 	@Test
 	void updateSuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		String url = "/products";
 
@@ -179,8 +177,6 @@ class ProductControllerTest {
 
 	@Test
 	void deteleSuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		String url = "/products";
 
@@ -201,8 +197,6 @@ class ProductControllerTest {
 
 	@Test
 	void findByIdSuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		String url = "/products";
 
@@ -223,8 +217,6 @@ class ProductControllerTest {
 
 	@Test
 	void countProductSuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		String url = "/products";
 
@@ -245,8 +237,6 @@ class ProductControllerTest {
 
 	@Test
 	void checkQuantitySuccessful() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		String url = "/products";
 

@@ -1,9 +1,6 @@
 package com.paulo.estudandoconfig.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -21,12 +18,15 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -39,12 +39,42 @@ import com.paulo.estudandoconfig.dto.ProductDTO;
 import com.paulo.estudandoconfig.exception.ExcentionController;
 import com.paulo.estudandoconfig.service.ProductService;
 
-import jakarta.servlet.ServletException;
-
 @WebMvcTest(controllers = ProductController.class)
+
 class ProductControllerTest {
 	@MockBean
 	ProductService service;
+
+	@Test
+	void saveProductValidator() throws JsonProcessingException, Exception {
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource.setBasename("classpath:messages");
+		messageSource.setDefaultEncoding("UTF-8");
+
+		LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+		bean.setValidationMessageSource(messageSource);
+
+		ProductController controller = new ProductController(service);
+		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
+				.setValidator(bean) // Configurar o validador aqui
+				.build();
+
+		String url = "/products";
+
+		ProductDTO dto = new ProductDTO().setPrice(BigDecimal.valueOf(-9000)).setQuantity(-90);
+		when(service.save(dto)).thenReturn("");
+
+		mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$").value(Matchers.hasItem("Please insert the category of the product")))
+				.andExpect(jsonPath("$")
+						.value(Matchers.hasItem("The quantity must me a number equal or greater than zero")))
+				.andExpect(
+						jsonPath("$").value(Matchers.hasItem("The price must me a number equal or greater than zero")))
+				.andExpect(jsonPath("$").value(Matchers.hasItem("Please insert the name of the product")))
+				.andExpect(status().isBadRequest());
+
+	}
 
 	@Test
 	void saveProductSuccessful() throws JsonProcessingException, Exception {
@@ -63,28 +93,6 @@ class ProductControllerTest {
 				.andReturn();
 		assertEquals(200, result.getResponse().getStatus());
 		assertEquals("", result.getResponse().getContentAsString());
-
-	}
-
-	@Test
-	void saveProductBlankCategory() throws JsonProcessingException, Exception {
-		ProductController controller = new ProductController(service);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
-				.build();
-		String url = "/products";
-
-		ProductDTO dto = new ProductDTO().setPrice(BigDecimal.valueOf(-9000)).setQuantity(-90);
-		when(service.save(dto)).thenReturn("");
-
-		// Act
-//		when(userMapper.toEntity(user)).
-
-		mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
-				.andExpect(jsonPath("$").isArray())
-				.andExpect(jsonPath("$").value(Matchers.hasItem("Insert a category")))
-				.andExpect(jsonPath("$").value(Matchers.hasItem("The quantity should not be negative")))
-				.andExpect(jsonPath("$").value(Matchers.hasItem("The price should not be negative")))
-				.andExpect(jsonPath("$").value(Matchers.hasItem("Insert the name"))).andExpect(status().isBadRequest());
 
 	}
 

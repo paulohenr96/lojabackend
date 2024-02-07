@@ -3,14 +3,19 @@ package com.paulo.estudandoconfig.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.paulo.estudandoconfig.model.Role;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 
 public class UserAccountDTO {
 
 	private Long id;
+	@NotBlank(message="{userdto.username.notBlank}")
 	private String userName;
+	@NotBlank(message="{userdto.password.notBlank}")
 	private String password;
+	@NotBlank(message="{userdto.name.notBlank}")
 	private String name;
+	@Min(value=0,message="{userdto.monthlyGoal.min}")
 	private BigDecimal monthlyGoal;
 
 	private List<String> rolesName;

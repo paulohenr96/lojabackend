@@ -6,7 +6,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +26,8 @@ import com.paulo.estudandoconfig.model.Metrics;
 import com.paulo.estudandoconfig.model.UserAccount;
 import com.paulo.estudandoconfig.repository.MetricRepository;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
+
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "http://localhost:4200")
 
@@ -53,7 +54,7 @@ public class UserController extends ContextHolder {
 	private UserAccountMapper userMapper;
 	
 	@PostMapping
-	public ResponseEntity<String> newUser(@RequestBody UserAccountDTO user) {
+	public ResponseEntity<String> newUser(@Valid @RequestBody UserAccountDTO user) {
 
 		
 		

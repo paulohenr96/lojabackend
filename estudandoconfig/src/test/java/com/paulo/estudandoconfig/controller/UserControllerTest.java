@@ -18,10 +18,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,10 +36,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paulo.estudandoconfig.dto.UserAccountDTO;
+import com.paulo.estudandoconfig.exception.ExcentionController;
 import com.paulo.estudandoconfig.mapper.UserAccountMapper;
 import com.paulo.estudandoconfig.model.Metrics;
 import com.paulo.estudandoconfig.model.Role;
@@ -56,22 +61,31 @@ class UserControllerTest {
 	UserAccountMapper userMapper;
 
 	String url = "/users";
+	MockMvc mockMvc;
+	@BeforeEach
+	void setUp() {
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource.setBasename("classpath:messages");
+		messageSource.setDefaultEncoding("UTF-8");
 
+		LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+		bean.setValidationMessageSource(messageSource);
+		UserController controller = new UserController(repository, metricsRepository, userMapper);
+		mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
+				.setValidator(bean).build();
+
+	}
 	@Test
 	void saveSuccessful() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+	
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("admin").setRolesName(List.of("admin"))
-				.setPassword(("123"));
+				.setPassword(("123")).setName("paulo");
 
 		UserAccount user = new UserAccount().setUserName("admin").setRoles(Set.of(new Role().setName("admin")))
 				.setPassword(("123"));
 		when(userMapper.toEntity(any(UserAccountDTO.class))).thenReturn(user);
 		when(repository.findByUserName(anyString())).thenReturn(Optional.empty());
-
-		// Act
-//		when(userMapper.toEntity(user)).
 
 		MvcResult result = mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
 				.andReturn();
@@ -80,14 +94,39 @@ class UserControllerTest {
 		assertEquals(200, result.getResponse().getStatus());
 		assertEquals("", result.getResponse().getContentAsString());
 	}
+	@Test
+	void saveValidator() throws Exception {
+
+		UserAccountDTO dto = new UserAccountDTO().setUserName("").setRolesName(List.of("admin")).setMonthlyGoal(BigDecimal.valueOf(-99))
+				.setPassword((""));
+
+		UserAccount user = new UserAccount().setUserName("admin").setRoles(Set.of(new Role().setName("admin")))
+				.setPassword(("123"));
+		when(userMapper.toEntity(any(UserAccountDTO.class))).thenReturn(user);
+		when(repository.findByUserName(anyString())).thenReturn(Optional.empty());
+
+		mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
+		.andExpect(jsonPath("$").isArray())
+		.andExpect(jsonPath("$").value(Matchers.hasItem("Please insert the username")))
+		.andExpect(jsonPath("$").value(Matchers.hasItem("Please insert the password")))
+		.andExpect(jsonPath("$").value(Matchers.hasItem("Please insert the name")))
+		.andExpect(jsonPath("$").value(Matchers.hasItem("The monthly goal must me a number equal or greater than zero")))
+
+		.andExpect(status().isBadRequest());
+		
+		
+		
+		
+		
+
+		
+	}
 
 	@Test
 	void saveInvalidUsername() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("admin").setRolesName(List.of("admin"))
-				.setPassword(("123"));
+				.setPassword(("123")).setName("Paulo");
 
 		UserAccount user = new UserAccount().setUserName("admin").setRoles(Set.of(new Role().setName("admin")))
 				.setPassword(("123"));
@@ -106,8 +145,6 @@ class UserControllerTest {
 
 	@Test
 	void editSuccessful() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("admin").setName("Claudio").setRolesName(List.of("admin"))
 				.setId(1L).setPassword(("123"));
@@ -130,8 +167,6 @@ class UserControllerTest {
 
 	@Test
 	void editStatusConflict() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("arc").setName("Claudio").setRolesName(List.of("admin"))
 				.setId(1L).setPassword(("123"));
@@ -152,8 +187,6 @@ class UserControllerTest {
 
 	@Test
 	void editStatusNotFound() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("arc").setName("Claudio").setRolesName(List.of("admin"))
 				.setId(1L).setPassword(("123"));
@@ -168,8 +201,6 @@ class UserControllerTest {
 
 	@Test
 	void newPasswordStatusOk() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("arc").setName("Claudio").setRolesName(List.of("admin"))
 				.setId(1L).setPassword(("123"));
@@ -187,8 +218,6 @@ class UserControllerTest {
 
 	@Test
 	void newPasswordStatusNotFound() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("arc").setName("Claudio").setRolesName(List.of("admin"))
 				.setId(1L).setPassword(("123"));
@@ -203,8 +232,6 @@ class UserControllerTest {
 
 	@Test
 	void getAllStatusOkList() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("arc").setName("Claudio").setRolesName(List.of("admin"))
 				.setId(1L).setPassword(("123"));
@@ -228,8 +255,6 @@ class UserControllerTest {
 	
 	@Test
 	void getByIdStatusOk() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -258,8 +283,6 @@ class UserControllerTest {
 	}
 	@Test
 	void getByIdStatusNotFound() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -281,8 +304,6 @@ class UserControllerTest {
 	
 	@Test
 	void deleteByIdStatusOk() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -298,8 +319,6 @@ class UserControllerTest {
 	}
 	@Test
 	void deleteByIdStatusNotFound() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -316,8 +335,6 @@ class UserControllerTest {
 	
 	@Test
 	void metricsStatusOkHaveMetrics() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -339,8 +356,6 @@ class UserControllerTest {
 	
 	@Test
 	void metricsStatusOkNewMetrics() throws Exception {
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -369,8 +384,6 @@ class UserControllerTest {
 		SecurityContextHolder.setContext(securityContext);
 		
 		
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -398,8 +411,6 @@ class UserControllerTest {
 		SecurityContextHolder.setContext(securityContext);
 		
 		
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -416,8 +427,6 @@ class UserControllerTest {
 	}
 	@Test
 	void editMetricsStatusOk() throws Exception{
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		
@@ -429,8 +438,6 @@ class UserControllerTest {
 	
 	@Test
 	void editMetricsStatusFORBIDDEN() throws Exception{
-		UserController controller = new UserController(repository, metricsRepository, userMapper);
-		MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
 		Long id=1L;
 		

@@ -95,6 +95,26 @@ class UserControllerTest {
 		assertEquals("", result.getResponse().getContentAsString());
 	}
 	@Test
+	void saveInvalidRole() throws Exception {
+	
+
+		UserAccountDTO dto = new UserAccountDTO().setUserName("admin").setRolesName(List.of("zxczxczxczx"))
+				.setPassword(("123")).setName("paulo");
+
+		UserAccount user = new UserAccount().setUserName("bvnvbnvbnvb").setRoles(Set.of(new Role().setName("admin")))
+				.setPassword(("123"));
+		when(userMapper.toEntity(any(UserAccountDTO.class))).thenReturn(user);
+		when(repository.findByUserName(anyString())).thenReturn(Optional.empty());
+
+		MvcResult result = mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(dto)))
+				.andReturn();
+
+		assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
+		assertEquals("The role zxczxczxczx isnt valid.", result.getResponse().getContentAsString());
+
+	}
+	
+	@Test
 	void saveValidator() throws Exception {
 
 		UserAccountDTO dto = new UserAccountDTO().setUserName("").setRolesName(List.of("admin")).setMonthlyGoal(BigDecimal.valueOf(-99))
@@ -111,7 +131,6 @@ class UserControllerTest {
 		.andExpect(jsonPath("$").value(Matchers.hasItem("Please insert the password")))
 		.andExpect(jsonPath("$").value(Matchers.hasItem("Please insert the name")))
 		.andExpect(jsonPath("$").value(Matchers.hasItem("The monthly goal must me a number equal or greater than zero")))
-
 		.andExpect(status().isBadRequest());
 		
 		

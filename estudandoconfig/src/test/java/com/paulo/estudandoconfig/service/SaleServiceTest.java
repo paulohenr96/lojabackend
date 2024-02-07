@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.logging.Log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,9 +64,16 @@ class SaleServiceTest {
 	@BeforeEach
 	void setUp() {
 
-		sale.setOwner("claudio").setId(1L).setDate(LocalDateTime.now()).setProducts(List.of(new ProductSale().setId(1L)
-				.setName("calça").setProductId(1L).setQuantity(20).setUnitPrice(BigDecimal.valueOf(900))));
+		sale.setOwner("claudio").setId(1L)
+		.setDate(LocalDateTime.now())
+		.setProducts(List.of(new ProductSale()
+						.setId(1L)
+						.setName("calça")
+						.setProductId(1L)
+						.setQuantity(20)
+						.setUnitPrice(BigDecimal.valueOf(900))));
 
+		
 		dto.setOwner("claudio").setId(1L).setDate(LocalDateTime.now())
 				.setProducts(List.of(new ProductSaleDTO().setId(1L).setName("calça").setProductId(1L)));
 	}

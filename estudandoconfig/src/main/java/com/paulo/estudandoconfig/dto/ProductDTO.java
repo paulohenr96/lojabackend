@@ -9,17 +9,17 @@ public class ProductDTO {
 	private Long id;
 	
 	
-	@NotBlank(message="Insert the name")
+	@NotBlank(message= "{productdto.name.notBlank}")
 	private String name;
 	
 	
-	@Min(value=0,message = "The quantity should not be negative")
+	@Min(value=0,message = "{productdto.quantity.min}")
 	private Integer quantity;
 	
-	@Min(value=0,message = "The price should not be negative")
+	@Min(value=0,message = "{productdto.price.min}")
 	private BigDecimal price;
 	
-	@NotBlank(message="Insert a category")
+	@NotBlank(message="{productdto.category.notBlank}")
 	private String category;
 
 	public String getName() {

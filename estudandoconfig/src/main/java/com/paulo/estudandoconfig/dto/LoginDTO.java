@@ -1,9 +1,13 @@
 package com.paulo.estudandoconfig.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginDTO {
 
 	
+	@NotBlank(message="{logindto.username.notBlank}")
 	private String username;
+	@NotBlank(message="{logindto.password.notBlank}")
 	private String password;
 	
 	public String getUsername() {

@@ -1,6 +1,7 @@
 package com.paulo.estudandoconfig.controller;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.paulo.estudandoconfig.context.ContextHolder;
 import com.paulo.estudandoconfig.dto.UserAccountDTO;
+import com.paulo.estudandoconfig.enums.RolesEnum;
 import com.paulo.estudandoconfig.mapper.UserAccountMapper;
 import com.paulo.estudandoconfig.model.Metrics;
 import com.paulo.estudandoconfig.model.UserAccount;
@@ -58,6 +60,7 @@ public class UserController extends ContextHolder {
 
 		
 		
+		user.getRolesName().forEach(RolesEnum::fromString);
 		
 		
 		return repo.findByUserName(user.getUserName()).map((e) -> ResponseEntity.ok(("Invalid Username")))

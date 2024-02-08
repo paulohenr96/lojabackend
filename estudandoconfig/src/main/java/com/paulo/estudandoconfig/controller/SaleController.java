@@ -22,6 +22,8 @@ import com.paulo.estudandoconfig.dto.ChartDTO;
 import com.paulo.estudandoconfig.dto.SaleDTO;
 import com.paulo.estudandoconfig.service.SaleService;
 
+import jakarta.validation.Valid;
+
 @CrossOrigin(origins ="http://localhost:4200/",
 allowCredentials ="true",
 methods = {RequestMethod.GET,RequestMethod.POST,RequestMethod.PUT,RequestMethod.DELETE})
@@ -36,7 +38,7 @@ public class SaleController {
 	private final SaleService service;
 
 	@PostMapping
-	public ResponseEntity<String> save(@RequestBody SaleDTO dto) {
+	public ResponseEntity<String> save(@Valid @RequestBody SaleDTO dto) {
 
 		return ResponseEntity.ok(service.finishSale(dto));
 	}

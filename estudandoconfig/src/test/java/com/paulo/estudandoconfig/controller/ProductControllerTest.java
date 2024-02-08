@@ -57,8 +57,9 @@ class ProductControllerTest {
 		bean.setValidationMessageSource(messageSource);
 
 		ProductController controller = new ProductController(service);
-		mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ExcentionController())
-				.setValidator(bean) // Configurar o validador aqui
+		mockMvc = MockMvcBuilders.standaloneSetup(controller)
+				.setControllerAdvice(new ExcentionController())
+				.setValidator(bean) 
 				.build();
 	}
 	
@@ -129,8 +130,6 @@ class ProductControllerTest {
 
 		when(service.getAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(dto)));
 
-		// Act
-//		when(userMapper.toEntity(user)).
 		MvcResult result = mockMvc.perform(get(url).param("page", "-1")).andReturn();
 
 		assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());

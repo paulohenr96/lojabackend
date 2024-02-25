@@ -30,6 +30,7 @@ import com.paulo.estudandoconfig.repository.MetricRepository;
 import com.paulo.estudandoconfig.repository.UserAccountRepository;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @CrossOrigin(origins = "http://localhost:4200")
 
@@ -77,7 +78,7 @@ public class UserController extends ContextHolder {
 	}
 
 	@PutMapping
-	public ResponseEntity edit(@RequestBody UserAccountDTO userDTO) {
+	public ResponseEntity edit(@Valid @RequestBody UserAccountDTO userDTO) {
 		return repo.findById(userDTO.getId()).map(user -> {
 			
 			boolean usernameChanged = !user.getUserName().equalsIgnoreCase(userDTO.getUserName());
@@ -136,7 +137,7 @@ public class UserController extends ContextHolder {
 	}
 
 	@PostMapping("confirmpassword")
-	public ResponseEntity<String> confirmPassword(@RequestBody String password) {
+	public ResponseEntity<String> confirmPassword( @RequestBody String password) {
 		String username = getUsername();
 		BiPredicate<String, String> matchPassword = (raw, crypto) -> new BCryptPasswordEncoder().matches(raw, crypto);
 		return matchPassword.test(password,
@@ -147,12 +148,8 @@ public class UserController extends ContextHolder {
 	}
 
 	@PutMapping("metrics")
-	public ResponseEntity<Metrics> editMetrics(@RequestBody Metrics m) {
-		if (m.getMonthlyGoal().compareTo(BigDecimal.ZERO)==-1) {
-			return 	new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-
-		}
+	public ResponseEntity<Metrics> editMetrics(@Valid @RequestBody Metrics m) {
+		
 		metricsRepository.save(m);
 		return ResponseEntity.ok(m);
 	}

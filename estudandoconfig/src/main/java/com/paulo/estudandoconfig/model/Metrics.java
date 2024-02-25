@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
 
 
 @Entity
@@ -24,6 +25,7 @@ public class Metrics implements Serializable{
 	private Long id;
 	
 	
+	@Min(value=0,message="{metrics.monthlyGoal.min}")
 	private BigDecimal monthlyGoal=BigDecimal.valueOf(0);
 
 	public BigDecimal getMonthlyGoal() {

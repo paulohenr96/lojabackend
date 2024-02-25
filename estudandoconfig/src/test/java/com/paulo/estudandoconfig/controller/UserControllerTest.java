@@ -234,6 +234,7 @@ class UserControllerTest {
 
 		assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
 	}
+	
 
 	@Test
 	void newPasswordStatusNotFound() throws Exception {
@@ -456,15 +457,20 @@ class UserControllerTest {
 	}
 	
 	@Test
-	void editMetricsStatusFORBIDDEN() throws Exception{
+	void editMetricsValidator() throws Exception{
 
 		Long id=1L;
 		
-		Metrics metrics = new Metrics().setId(1L).setMonthlyGoal(BigDecimal.valueOf(-100));
+		Metrics metrics = new Metrics().setId(1L).setMonthlyGoal(BigDecimal.valueOf(-1000));
 		
 		 mockMvc.perform(put(url.concat("/metrics")).contentType(MediaType.APPLICATION_JSON_VALUE).content(toJson(metrics)))
-		 	.andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+			.andExpect(jsonPath("$").isArray())
+			.andExpect(jsonPath("$").value(Matchers.hasItem("The monthly goal should be equal or greater than zero")))
+			.andExpect(status().isBadRequest());
 	}
+	
+	
+	
 	
 	String toJson(Object o) throws JsonProcessingException {
 		return new ObjectMapper().writeValueAsString(o);
